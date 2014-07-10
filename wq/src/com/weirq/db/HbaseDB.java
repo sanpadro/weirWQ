@@ -7,9 +7,11 @@ import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
@@ -281,6 +283,22 @@ public class HbaseDB  implements Serializable{
 		}
 		return name;
 	}
+	public static String getStringById(String tableName,Long rowKey,String family,String qualifier) {
+		String name = null;
+		try {
+			HTable table = new HTable(TableName.valueOf(tableName), connection);
+			Get get = new Get(Bytes.toBytes(rowKey));
+			get.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier));
+			Result rs = table.get(get);
+			byte[] value = rs.getValue(Bytes.toBytes(family), Bytes.toBytes(qualifier));
+			name = Bytes.toString(value);
+			table.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return name;
+	}
 	/**
 	 * 通过目录名获取ID
 	 * @param name
@@ -348,6 +366,19 @@ public class HbaseDB  implements Serializable{
 		}
 		table.close();
 	}
+	public void queryAllHDFS(String username) throws Exception {
+		HTable table = new HTable(TableName.valueOf("hdfs"), connection);
+		ResultScanner rs = table.getScanner(new Scan());
+		for (Result result : rs) {
+			System.out.println("rowkey" +result.getRow());
+			for (Cell cell : result.rawCells()) {
+				System.out.println("family"+new String(cell.getFamilyArray()));
+				System.out.println("Qualifier"+new String(cell.getQualifierArray()));
+				System.out.println("value"+new String(cell.getValueArray()));
+			}
+		}
+		table.close();
+	}
 	
 	public static List<Menu> qureyAllEmun() throws Exception {
 		HTable table = new HTable(TableName.valueOf("emun"), connection);
@@ -368,10 +399,43 @@ public class HbaseDB  implements Serializable{
 	}
 	
 	public static void getAllUserTree(Long id) throws Exception {
+		HTable table_hdfs = new HTable(TableName.valueOf("hdfs"), connection);
 		HTable table = new HTable(TableName.valueOf("hdfs_cid"), connection);
 		Get get = new Get(Bytes.toBytes(id));
-		get.addColumn(Bytes.toBytes("user"), Bytes.toBytes("pwd"));
 		Result rs = table.get(get);
+//		for (KeyValue kv : rs.raw()) {
+//			System.out.println(Bytes.toLong(kv.getValue()));
+//		}
+		List<Menu> menus = new ArrayList<Menu>();
+		Menu menu = null;
+		for (Cell cell : rs.rawCells()) {
+			Get get1 = new Get(CellUtil.cloneValue(cell));
+			get1.addColumn(Bytes.toBytes("dir"), Bytes.toBytes("name"));
+			Result rs1 = table_hdfs.get(get1);
+			byte[] value = rs1.getValue(Bytes.toBytes("dir"), Bytes.toBytes("name"));
+			String name = Bytes.toString(value);
+			
+			get1.addColumn(Bytes.toBytes("dir"), Bytes.toBytes("type"));
+			Result rs2 = table_hdfs.get(get1);
+			byte[] type = rs2.getValue(Bytes.toBytes("dir"), Bytes.toBytes("type"));
+			String y = Bytes.toString(type);
+			menu = new Menu();
+			menu.setId(Bytes.toString(CellUtil.cloneValue(cell)));
+			menu.setName(name);
+			
+//			if ("D".equals(y)) {
+//				
+//			}else if ("F".equals(y)) {
+//				
+//			}
+		}
+//		List<Cell> cells = rs.listCells();
+//		if (cells!=null) {
+//			for (Cell cell : cells) {
+//				System.out.println(Bytes.toLong(cell.getValueArray()));
+//			}
+//		}
+		table.close();
 	}
 	
 	public static void main(String[] args) throws Exception {
@@ -386,9 +450,9 @@ public class HbaseDB  implements Serializable{
 //		db.queryAll("user_id");
 //		db.initEmun();
 		
-		String table_hdfs = "hdfs";
-		String[] fam_hdfs = {"dir"};
-		db.createTable(table_hdfs, fam_hdfs);
+//		String table_hdfs = "hdfs";
+//		String[] fam_hdfs = {"dir"};
+//		db.createTable(table_hdfs, fam_hdfs);
 		
 //		String table_hdfs_name = "hdfs_name";
 //		String[] fam_hdfs_id = {"id"};
