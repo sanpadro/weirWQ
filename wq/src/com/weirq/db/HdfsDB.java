@@ -16,6 +16,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.util.Progressable;
 
+import com.weirq.util.DateUtil;
+import com.weirq.vo.HdfsVo;
 import com.weirq.vo.Menu;
 
 public class HdfsDB {
@@ -47,7 +49,7 @@ public class HdfsDB {
 
 			@Override
 			public void progress() {
-				System.out.println("ok");
+				//System.out.println("ok");
 			}
 		});
 		IOUtils.copyBytes(in, out, 4096, true);
@@ -59,17 +61,24 @@ public class HdfsDB {
 		}
 	}
 
-	public void queryAll(String dir) throws Exception {
+	public List<HdfsVo> queryAll(String dir) throws Exception {
 		FileStatus[] files = fs.listStatus(new Path(ROOT + dir));
+		List<HdfsVo> hdfsVos = new ArrayList<HdfsVo>();
+		HdfsVo hdfsVo = null;
 		for (int i = 0; i < files.length; i++) {
+			hdfsVo = new HdfsVo();
 			if (files[i].isDirectory()) {
-				System.out.println(files[i].getPath().getName() + "目录");
-				System.out.println(files[i].getPath() + "目录");
-				queryAll(files[i].getPath().toString());
+				hdfsVo.setName(files[i].getPath().getName());
+				hdfsVo.setType("D");
+				hdfsVo.setCreateDate(DateUtil.longToString("yyyy-MM-dd hh:mm:ss", files[i].getModificationTime()));
 			} else if (files[i].isFile()) {
-				System.out.println(files[i].getPath().getName() + "文件");
+				hdfsVo.setName(files[i].getPath().getName());
+				hdfsVo.setType("F");
+				hdfsVo.setCreateDate(DateUtil.longToString("yyyy-MM-dd hh:mm:ss", files[i].getModificationTime()));
 			}
+			hdfsVos.add(hdfsVo);
 		}
+		return hdfsVos;
 	}
 	static List<Menu> menus = new ArrayList<Menu>();
 	public static void visitPath(String path) throws IOException {

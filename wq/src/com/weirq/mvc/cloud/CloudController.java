@@ -1,25 +1,33 @@
 package com.weirq.mvc.cloud;
 
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.weirq.mvc.BaseController;
 import com.weirq.util.Json;
+import com.weirq.vo.HdfsVo;
 
 @Controller
 @RequestMapping("/cloud")
 public class CloudController extends BaseController{
 
+	@ResponseBody
 	@RequestMapping("/list")
-	public String list(HttpSession session) throws Exception {
+	public List<HdfsVo> list(HttpSession session,Model model) throws Exception {
 		String name = (String) session.getAttribute("username");
-		long id = db.getIdByDirName(name);
-		db.getAllUserTree(id);
-		
-		return "/cloud/list";
+		return hdfsDB.queryAll(name);
 	}
 	/**
 	 * 创建目录
@@ -60,5 +68,16 @@ public class CloudController extends BaseController{
 			json.setMsg("创建失败");
 		}
 		return json;
+	}
+	
+	@RequestMapping("/upload")
+	public String upload(HttpServletRequest request) {
+		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getServletContext());
+		if (multipartResolver.isMultipart(request)) {
+			MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+			
+			
+		}
+		return null;
 	}
 }

@@ -463,6 +463,11 @@ public class HbaseDB  implements Serializable{
 //		db.createTable(table_hdfs_cid, fam_cid);
 		
 //		System.out.println(db.checkEmail("21212121"));
+		
+		HTable table_gid = new HTable(TableName.valueOf("gid"), connection);
+		long id02 = table_gid.incrementColumnValue(Bytes.toBytes("gid"), Bytes.toBytes("gid"), Bytes.toBytes("gid"), 1);
+		db.add("emun", id02, "emun", "name", "云盘");
+		db.add("emun", id02, "emun", "url", "/cloud/list.jsp");
 		System.out.println("ok");
 	}
 }

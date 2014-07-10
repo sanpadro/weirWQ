@@ -6,31 +6,28 @@
 <meta name="content-type" content="text/html; charset=UTF-8">
 <jsp:include page="/pub.jsp"></jsp:include>
 <script type="text/javascript">
-var cloud_treeGrid;
+var cloudDataGrid;
 $(function() {
-	cloud_treeGrid=$('#cloud_treeGrid').treegrid({
+	cloudDataGrid = $('#cloud_dataGrid').datagrid({
 		url : '${pageContext.request.contextPath}/cloud/list.do',
-		idField : 'id',
-		treeField : 'name',
-		parentField : 'pid',
 		fit : true,
-		fitColumns : false,
+		fitColumns : true,
 		border : false,
+		idField : 'name',
 		columns : [ [ {
-			title : '编号',
-			field : 'id',
-			width : 150,
-			hidden : true
-		}, {
-			title : '菜单名称',
 			field : 'name',
-			width : 180,
-			editor:{
-				type:'validatebox',
-				options:{
-					required:true
-				}
+			title : '编号',
+			width : 100,
+			formatter : function(value, row) {
+				var str = '';
+				str += '<img src="${pageContext.request.contextPath}/folder.png"/>';
+				str += row.name;
+				return str;
 			}
+		},{
+			field : 'createDate',
+			title : '创建时间',
+			width : 100
 		}] ],
 		toolbar : [ {
 			iconCls : 'ext-icon-add',
@@ -44,16 +41,7 @@ $(function() {
 			handler : function() {
 				mkdir();
 			}
-		} ],
-		onContextcloud : function(e, row) {
-			e.preventDefault();
-			$(this).treegrid('unselectAll');
-			$(this).treegrid('select', row.id);
-			$('#cloud_menu').menu('show', {
-				left : e.pageX,
-				top : e.pageY
-			});
-		}
+		} ]
 	});
 });
 function mkdir(){
@@ -94,10 +82,9 @@ function mkdir(){
 <body>
 <div class="easyui-layout" data-options="fit:true,border:false">
 	<div data-options="region:'center',border:false,title:'你的云盘'" style="overflow: hidden;">
-		<table id="cloud_treeGrid"></table>
+		<table id="cloud_dataGrid"></table>
 	</div>
 </div>
-
 <div id="cloud_menu" class="easyui-menu" style="width: 120px;display: none;">
 <div onclick="userAdd()" iconCls="icon-add">增加</div>
 <div onclick="userEdit()" iconCls="icon-edit">编辑</div>
