@@ -95,3 +95,9 @@ function getFormatDate(date, pattern) {
 	}
 	return date.format(pattern);
 }
+function formatString(str) {
+	for (var i = 0; i < arguments.length - 1; i++) {
+		str = str.replace("{" + i + "}", arguments[i + 1]);
+	}
+	return str;
+};

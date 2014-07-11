@@ -26,9 +26,10 @@
 		});
 	}
 	function logoutFun() {
-		$.post('user/logout.do', function(j) {
+		/* $.post('logout.do', function(j) {
 			location.replace('index.jsp');
-		}, 'json');
+		}, 'json'); */
+		location.href='logout.do';
 	}
 	function lockWindowFun() {
 		$.post('user/logout.do', function(j) {

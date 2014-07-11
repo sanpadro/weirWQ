@@ -32,4 +32,11 @@ public class LoginController extends BaseController {
 		}
 		return json;
 	}
+	@RequestMapping("logout")
+	public String logout(HttpSession session) {
+		if (session!=null) {
+			session.invalidate();
+		}
+		return "redirect:index.jsp";
+	}
 }
