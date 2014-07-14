@@ -19,7 +19,7 @@
 function Uploader(chunk,callBack){
 	var addWin = $('<div style="overflow: hidden;"/>');
 	var upladoer = $('<iframe/>');
-	upladoer.attr({'src':'66.jsp?chunk='+chunk,width:'100%',height:'100%',frameborder:'0',scrolling:'no'});
+	upladoer.attr({'src':'uploader.jsp?chunk='+chunk,width:'100%',height:'100%',frameborder:'0',scrolling:'no'});
 	addWin.window({
 		title:"上传文件",
 		height:350,
@@ -67,8 +67,8 @@ function makerUpload(chunk){
 <body style="width: 100%;height: 100%;overflow:hidden;margin: 0;padding: 0;">
 	<h1>GodSon Easyui 结合Pluplaod插件的上传演示</h1>
 	<hr/>
-	<a class="easyui-linkbutton" href="javascript:makerUpload(false)" onclick="makerUpload(false)">不分割文件上传</a> 
-	<a class="easyui-linkbutton" href="javascript:makerUpload(true)">分割文件上传</a>
+	<a class="easyui-linkbutton" onclick="makerUpload(false)">不分割文件上传</a> 
+	<a class="easyui-linkbutton" onclick="makerUpload(true)">分割文件上传</a>
 	<hr/>
 	<div id="res"></div>
 </body>

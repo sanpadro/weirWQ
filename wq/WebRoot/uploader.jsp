@@ -15,6 +15,7 @@ var files = [];
 var errors = [];
 var type = 'file';
 var chunk = eval('${param.chunk}');
+alert(chunk);
 var max_file_size = '5mb';
 //var filters = {title : "文档", extensions : "zip,doc,docx,xls,xlsx,ppt,pptx"};
 $("#uploader").pluploadQueue($.extend({

@@ -6,11 +6,11 @@
 <meta name="content-type" content="text/html; charset=UTF-8">
 <jsp:include page="/pub.jsp"></jsp:include>
 <script type="text/javascript">
-var mkdir_submitForm = function(dialog, cloud_treeGrid, p) {
+var mkdir_submitForm = function(dialog, cloudDataGrid, p) {
 	if ($('mkdir_addForm').form('validate')) {
 		$.post('${pageContext.request.contextPath}/cloud/mkdir.do', $("#mkdir_addForm").serialize(), function(j) {
 			if (j.success) {
-				cloud_treeGrid.treegrid('reload');
+				cloudDataGrid.datagrid('reload');
 				dialog.dialog('destroy');
 			}
 			p.messager.show({
@@ -27,7 +27,7 @@ var mkdir_submitForm = function(dialog, cloud_treeGrid, p) {
 
 <body>
 	<form id="mkdir_addForm" method="post">
-		<input type="hidden" id="mkdir_pid" name="parentId" value="${mkdir.parentId}"/> 
+		<input type="hidden" id="mkdir_dir" name="dirName"/> 
 		<table>
 			<tr>
 				<th>文件夹名称</th>

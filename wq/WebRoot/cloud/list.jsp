@@ -13,27 +13,42 @@ $(function() {
 		fit : true,
 		fitColumns : true,
 		border : false,
-		idField : 'name',
+		idField : 'id',
 		columns : [ [ {
 			field : 'name',
 			title : '编号',
+			width : 100
+		},{
+			field : 'date',
+			title : '创建时间',
+			width : 100
+		},{
+			field : 'type',
+			title : '类型',
 			width : 100,
 			formatter : function(value, row) {
 				var str = '';
-				str += '<img src="${pageContext.request.contextPath}/folder.png"/>';
-				str += row.name;
+				if(row.type=='D'){
+					str += '文件夹';
+				}else if(row.type=='F'){
+					str += '文件';
+				}
 				return str;
 			}
 		},{
-			field : 'createDate',
-			title : '创建时间',
+			field : 'dir',
+			title : '目录',
+			width : 100
+		},{
+			field : 'pdir',
+			title : '上级目录',
 			width : 100
 		}] ],
 		toolbar : [ {
 			iconCls : 'ext-icon-add',
 			text : '上传',
 			handler : function() {
-				addcloudFun('c');
+				upload();
 			}
 		},{
 			iconCls : 'ext-icon-add',
@@ -41,25 +56,45 @@ $(function() {
 			handler : function() {
 				mkdir();
 			}
-		} ]
+		} ],
+		onRowContextMenu:function(e, rowIndex, rowData){
+			e.preventDefault();
+			$(this).datagrid('unselectAll');
+			$(this).datagrid('selectRow',rowIndex);
+			$('#cloud_menu').menu('show', {
+				left : e.pageX,
+				top : e.pageY
+			});
+		}
 	});
 });
+
+function upload(){
+	var name = null;
+	if(cloudDataGrid.datagrid('getSelected')!=null){
+		name = cloudDataGrid.datagrid('getSelected').dir;
+	}
+	if(name==null){
+		name = "root";
+	}
+	//console.info(name);
+	var dialog = parent.modalDialog({
+		title : '上传文件',
+		width : 550,
+		height : 460,
+		url : '${pageContext.request.contextPath}/cloud/upload11.jsp?dir='+name
+	});
+	/* Uploader(chunk,dir,function(files){
+		 if(files && files.length>0){
+			 //$("#res").text("成功上传："+files.join(","));
+		 }
+	 }); */
+}
 function mkdir(){
-	var pid=null;
-	if(cloud_treeGrid.treegrid('getSelected')!=null){
-		var id = cloud_treeGrid.treegrid('getSelected').departmentId;
-		if(m=='p'){
-			pid=id;
-		}else if(m=='c'){
-			var node = cloud_treeGrid.treegrid('getParent',id);
-			if(node!=null){
-				pid = cloud_treeGrid.treegrid('getParent',id).departmentId;
-			}else{
-				pid=null;
-			}
-		}
-	}else{
-		pid=null;
+	var name = null;
+	//console.info(cloudDataGrid.datagrid('getSelected'));
+	if(cloudDataGrid.datagrid('getSelected')!=null){
+		name = cloudDataGrid.datagrid('getSelected').dir;
 	}
 	var dialog = parent.modalDialog({
 		title : '创建文件夹',
@@ -70,8 +105,8 @@ function mkdir(){
 			text : '创建',
 			handler : function() {
 			    var mkdir = dialog.find('iframe').get(0).contentWindow;
-			    mkdir.document.getElementById("mkdir_pid").value=pid;
-			    mkdir.mkdir_submitForm(dialog, cloud_treeGrid, parent.$);
+			    mkdir.document.getElementById("mkdir_dir").value=name;
+			    mkdir.mkdir_submitForm(dialog, cloudDataGrid, parent.$);
 			}
 		} ]
 	});
@@ -80,6 +115,7 @@ function mkdir(){
 </head>
 
 <body>
+<input type="hidden" id="tree" value="${tree}"/>
 <div class="easyui-layout" data-options="fit:true,border:false">
 	<div data-options="region:'center',border:false,title:'你的云盘'" style="overflow: hidden;">
 		<table id="cloud_dataGrid"></table>

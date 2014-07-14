@@ -1,4 +1,51 @@
 /**
+ * 创建上传窗口 公共方法
+ * @param chunk 是否分割大文件
+ * @param callBack 上传成功之后的回调
+ */
+function Uploader(chunk,callBack){
+	var addWin = $('<div style="overflow: hidden;"/>');
+	var upladoer = $('<iframe/>');
+	upladoer.attr({'src':'/wq/cloud/upload.jsp?chunk='+chunk,width:'100%',height:'100%',frameborder:'0',scrolling:'no'});
+	addWin.window({
+		title:"上传文件",
+		height:350,
+		width:550,
+		minimizable:false,
+		modal:true,
+		collapsible:false,
+		maximizable:false,
+		resizable:false,
+		content:upladoer,
+		onClose:function(){
+			var fw = GetFrameWindow(upladoer[0]);
+			var files = fw.files;
+			$(this).window('destroy');
+			if(files.lenght>0){
+				callBack.call(this,files);
+			}
+			//console.info(fw.files);
+			
+			
+		},
+		onOpen:function(){
+			var target = $(this);
+			setTimeout(function(){
+				var fw = GetFrameWindow(upladoer[0]);
+				fw.target = target;
+			},10);
+		}
+	});
+}
+/**
+ * 根据iframe对象获取iframe的window对象
+ * @param frame
+ * @returns {Boolean}
+ */
+function GetFrameWindow(frame){
+	return frame && typeof(frame)=='object' && frame.tagName == 'IFRAME' && frame.contentWindow;
+}
+/**
  * 扩展treegrid，使其支持平滑数据格式
  * 
  * @author 孙宇

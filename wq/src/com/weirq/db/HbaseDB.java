@@ -23,8 +23,14 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.filter.BinaryComparator;
+import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
+import org.apache.hadoop.hbase.filter.Filter;
+import org.apache.hadoop.hbase.filter.QualifierFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import com.weirq.util.DateUtil;
+import com.weirq.vo.FileSystemVo;
 import com.weirq.vo.Menu;
 
 
@@ -438,6 +444,39 @@ public class HbaseDB  implements Serializable{
 		table.close();
 	}
 	
+	public static List<FileSystemVo> getFile(String dir) throws Exception {
+		HTable fileTable = new HTable(TableName.valueOf("filesystem"), connection);
+		Scan scan = new Scan();
+		Filter filter = new QualifierFilter(CompareOp.LESS_OR_EQUAL, new BinaryComparator(Bytes.toBytes(dir)));
+		scan.setFilter(filter);
+		ResultScanner rs = fileTable.getScanner(scan);
+		List<FileSystemVo> fs = new ArrayList<FileSystemVo>();
+		FileSystemVo f = null;
+		for (Result r : rs) {
+			
+			Cell cellName = r.getColumnLatestCell(Bytes.toBytes("files"), Bytes.toBytes("name"));
+			Cell cellPdir = r.getColumnLatestCell(Bytes.toBytes("files"), Bytes.toBytes("pdir"));
+			Cell cellType = r.getColumnLatestCell(Bytes.toBytes("files"), Bytes.toBytes("type"));
+			f = new FileSystemVo();
+			f.setId(Bytes.toLong(r.getRow()));
+			f.setDir(dir);
+			f.setName(Bytes.toString(CellUtil.cloneValue(cellName)));
+			if(cellPdir!=null){
+				f.setPdir(Bytes.toString(CellUtil.cloneValue(cellPdir)));
+			}
+			if (cellType!=null) {
+				f.setType(Bytes.toString(CellUtil.cloneValue(cellType)));
+			}
+			f.setDate(DateUtil.longToString("yyyy-MM-dd HH:mm", cellName.getTimestamp()));
+			fs.add(f);
+//			System.out.println(Bytes.toString(CellUtil.cloneValue(cellName)));
+//			System.out.println(Bytes.toString(CellUtil.cloneValue(cellPdir)));
+//			System.out.println(Bytes.toString(CellUtil.cloneValue(cellType)));
+		}
+		fileTable.close();
+		return fs;
+	}
+	
 	public static void main(String[] args) throws Exception {
 		HbaseDB db = new HbaseDB();
 		
@@ -464,10 +503,31 @@ public class HbaseDB  implements Serializable{
 		
 //		System.out.println(db.checkEmail("21212121"));
 		
+//		HTable table_gid = new HTable(TableName.valueOf("gid"), connection);
+//		long id02 = table_gid.incrementColumnValue(Bytes.toBytes("gid"), Bytes.toBytes("gid"), Bytes.toBytes("gid"), 1);
+//		db.add("emun", id02, "emun", "name", "云盘");
+//		db.add("emun", id02, "emun", "url", "/cloud/list.jsp");
+		
+		
+		/*String table_files = "filesystem";
+		String[] fam_file = {"files"};
+		db.createTable(table_files, fam_file);
+		
 		HTable table_gid = new HTable(TableName.valueOf("gid"), connection);
+		
 		long id02 = table_gid.incrementColumnValue(Bytes.toBytes("gid"), Bytes.toBytes("gid"), Bytes.toBytes("gid"), 1);
-		db.add("emun", id02, "emun", "name", "云盘");
-		db.add("emun", id02, "emun", "url", "/cloud/list.jsp");
+		db.add(table_files, id02, "files", "name", "weir01");
+		db.add(table_files, id02, "files", "dir", "weirqq");
+		db.add(table_files, id02, "files", "pdir", "");
+		db.add(table_files, id02, "files", "type", "D");*/
+		
+//		db.getFile("weirqq");
+		
+		
+		
+//		String table_files_id = "files_id";
+//		String[] fam_id = {"id"};
+//		db.createTable(table_files_id, fam_id);
 		System.out.println("ok");
 	}
 }

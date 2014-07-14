@@ -16,20 +16,22 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   </head>
   
   <body>
+
 <div id="uploader" style="width: 500px;height: 400px">
     <p>Your browser doesn't have Flash, Silverlight or HTML5 support.</p>
 </div>
- <pre id="log" style="height: 300px; overflow: auto"></pre>
+ <!-- <pre id="log" style="height: 300px; overflow: auto"></pre> -->
  
  
 <script type="text/javascript">
+//var dir = eval('${param.dir}');
 // Convert divs to queue widgets when the DOM is ready
 $(function() {
  
     $("#uploader").pluploadQueue({
         // General settings
         runtimes : 'html5,flash,silverlight,html4',
-        url : 'cloud/upload.do',
+        url : '${pageContext.request.contextPath}/cloud/upload.do',
        // chunk_size : '1mb',
         unique_names : true,
  
@@ -45,6 +47,8 @@ $(function() {
                 {title : "Zip files", extensions : "zip"}
             ]
         }, */
+        
+        //'multipart_params':{'dir':''},
  
         // Flash settings
         flash_swf_url : '/plupload/js/Moxie.swf',
@@ -63,7 +67,8 @@ $(function() {
  
                 // You can override settings before the file is uploaded
                 // up.setOption('url', 'upload.php?id=' + file.id);
-                // up.setOption('multipart_params', {param1 : 'value1', param2 : 'value2'});
+                //up.setOption('url','${pageContext.request.contextPath}/cloud/upload.do'); 
+                //up.setOption('multipart_params', {dir : ${param.dir}});
             }
         },
  
@@ -72,7 +77,7 @@ $(function() {
             PostInit: function() {
                 // Called after initialization is finished and internal event handlers bound
                 //log('[PostInit]');
-                 
+                //uploader.setOption("multipart_params",{"dir":${param.dir}}); 
                 document.getElementById('uploadfiles').onclick = function() {
                     uploader.start();
                     return false;
@@ -105,8 +110,10 @@ $(function() {
             },
  
             BeforeUpload: function(up, file) {
+            	//uploader.setOption('multipart_params',{'dir':${param.dir}}); 
                 // Called right before the upload for a given file starts, can be used to cancel it if required
                // log('[BeforeUpload]', 'File: ', file);
+            	up.setOption('url','${pageContext.request.contextPath}/cloud/upload.do?dir=${param.dir}'); 
             },
   
             UploadProgress: function(up, file) {
@@ -120,6 +127,8 @@ $(function() {
             },
   
             FilesAdded: function(up, files) {
+            	//uploader.multipart_params.dir = ${param.dir};
+            	//multipart_params.dir = dir;
                 // Called when files are added to queue
                 //log('[FilesAdded]');
   
@@ -140,7 +149,7 @@ $(function() {
             FileUploaded: function(up, file, info) {
                 // Called when file has finished uploading
                // log('[FileUploaded] File:', file, "Info:", info);
-            	console.info(info);
+            	//console.info(info);
             },
   
             ChunkUploaded: function(up, file, info) {
@@ -150,8 +159,8 @@ $(function() {
  
             UploadComplete: function(up, files) {
                 // Called when all files are either uploaded or failed
-               console.info(up);
-               console.info(files);
+               //console.info(up);
+               //console.info(files);
                // log('[UploadComplete]');
             },
  

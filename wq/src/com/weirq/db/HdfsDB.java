@@ -54,10 +54,19 @@ public class HdfsDB {
 		});
 		IOUtils.copyBytes(in, out, 4096, true);
 	}
+	public void upload(InputStream in, String dir) throws Exception {
+		OutputStream out = fs.create(new Path(dir), new Progressable() {
+			@Override
+			public void progress() {
+				//System.out.println("ok");
+			}
+		});
+		IOUtils.copyBytes(in, out, 4096, true);
+	}
 
 	public void mkdir(String dir) throws Exception {
-		if (!fs.exists(new Path(ROOT+dir))) {
-			fs.mkdirs(new Path(ROOT+dir));
+		if (!fs.exists(new Path(dir))) {
+			fs.mkdirs(new Path(dir));
 		}
 	}
 
@@ -67,6 +76,7 @@ public class HdfsDB {
 		HdfsVo hdfsVo = null;
 		for (int i = 0; i < files.length; i++) {
 			hdfsVo = new HdfsVo();
+			hdfsVo.setId(dir);
 			if (files[i].isDirectory()) {
 				hdfsVo.setName(files[i].getPath().getName());
 				hdfsVo.setType("D");

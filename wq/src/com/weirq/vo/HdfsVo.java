@@ -2,6 +2,7 @@ package com.weirq.vo;
 
 public class HdfsVo {
 
+	private String id;
 	private String name;
 	private String type;
 	private String createDate;
@@ -28,5 +29,10 @@ public class HdfsVo {
 	public void setCreateDate(String createDate) {
 		this.createDate = createDate;
 	}
-	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
 }

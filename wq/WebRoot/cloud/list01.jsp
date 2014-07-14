@@ -44,11 +44,19 @@ function mkdir(){
 </head>
 
 <body>
-<c:forEach items="${hdfs}" var="entry">
-<div>
-<img alt="" src="${pageContext.request.contextPath}/folder.png">
-${entry.name}
-</div>
+<table>
+<tr>
+<td>文件名</td>
+<td>文件类型</td>
+<td>创建日期</td>
+</tr>
+<c:forEach items="${fs}" var="entry">
+<tr>
+<td>${entry.name}</td>
+<td>${entry.type}</td>
+<td>${entry.date}</td>
+</tr>
 </c:forEach>
+</table>
 </body>
 </html>
