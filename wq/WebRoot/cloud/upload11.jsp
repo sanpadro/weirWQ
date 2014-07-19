@@ -16,10 +16,11 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   </head>
   
   <body>
-
+<form id="upload_Form" method="post">
 <div id="uploader" style="width: 500px;height: 400px">
     <p>Your browser doesn't have Flash, Silverlight or HTML5 support.</p>
 </div>
+</form>
  <!-- <pre id="log" style="height: 300px; overflow: auto"></pre> -->
  
  
@@ -78,10 +79,10 @@ $(function() {
                 // Called after initialization is finished and internal event handlers bound
                 //log('[PostInit]');
                 //uploader.setOption("multipart_params",{"dir":${param.dir}}); 
-                document.getElementById('uploadfiles').onclick = function() {
+                /* document.getElementById('uploadfiles').onclick = function() {
                     uploader.start();
                     return false;
-                };
+                }; */
             },
  
             Browse: function(up) {
@@ -176,53 +177,7 @@ $(function() {
             }
         }
     });
- 
- 
-    function log() {
-        var str = "";
- 
-        plupload.each(arguments, function(arg) {
-            var row = "";
- 
-            if (typeof(arg) != "string") {
-                plupload.each(arg, function(value, key) {
-                    // Convert items in File objects to human readable form
-                    if (arg instanceof plupload.File) {
-                        // Convert status to human readable
-                        switch (value) {
-                            case plupload.QUEUED:
-                                value = 'QUEUED';
-                                break;
- 
-                            case plupload.UPLOADING:
-                                value = 'UPLOADING';
-                                break;
- 
-                            case plupload.FAILED:
-                                value = 'FAILED';
-                                break;
- 
-                            case plupload.DONE:
-                                value = 'DONE';
-                                break;
-                        }
-                    }
- 
-                    if (typeof(value) != "function") {
-                        row += (row ? ', ' : '') + key + '=' + value;
-                    }
-                });
- 
-                str += row + " ";
-            } else {
-                str += arg + " ";
-            }
-        });
- 
-        var log = $('#log');
-        log.append(str + "\n");
-        log.scrollTop(log[0].scrollHeight);
-    }
+    
 });
 </script>
  

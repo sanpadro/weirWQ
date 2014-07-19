@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.weirq.mvc.BaseController;
+import com.weirq.util.BaseUtils;
 import com.weirq.util.Json;
 import com.weirq.vo.FileSystemVo;
 import com.weirq.vo.HdfsVo;
@@ -27,30 +28,20 @@ import com.weirq.vo.HdfsVo;
 @RequestMapping("/cloud")
 public class CloudController extends BaseController{
 
-	@ResponseBody
 	@RequestMapping("/list")
-	public List<FileSystemVo> list(FileSystemVo fs,HttpSession session,Model model) throws Exception {
+	public String list(FileSystemVo fs,HttpSession session,Model model) throws Exception {
 		String name = null;
 		if (fs.getName()==null) {
 			name = (String) session.getAttribute("username");
+			name = "/"+name;
 		}else{
 			name = fs.getName();
 		}
-		return db.getFile(name);
+		model.addAttribute("fs", db.getFile(name));
+		model.addAttribute("dir", name);
+		return "/cloud/list";
 	}
-/*	@ResponseBody
-	@RequestMapping("/list")
-	public List<HdfsVo> list(HdfsVo hdfsVo,HttpSession session,Model model) throws Exception {
-		String id = null;
-		if (hdfsVo.getId()==null) {
-			id = (String) session.getAttribute("username");
-		}else{
-			id = hdfsVo.getId();
-		}
-		model.addAttribute("tree", id);
-		return hdfsDB.queryAll(id);
-	}
-*/	/**
+	/**
 	 * 创建目录
 	 * @param mkdir
 	 * @param session
@@ -68,7 +59,7 @@ public class CloudController extends BaseController{
 		try {
 			String dir = null;
 			if (!"".equals(dirName.trim())&& dirName!=null) {
-				dir = dirName;
+				dir = "/"+dirName;
 			}else {
 				dir = "/"+name;
 			}
@@ -98,7 +89,7 @@ public class CloudController extends BaseController{
 	
 	@ResponseBody
 	@RequestMapping("/upload")
-	public Json upload(@RequestParam("dir") String dir,HttpServletRequest request,HttpSession session) throws Exception {
+	public Json upload(String dir,HttpSession session,HttpServletRequest request) throws Exception {
 		Json json = new Json();
 		String name = (String) session.getAttribute("username");
 		if (name==null) {
@@ -107,6 +98,8 @@ public class CloudController extends BaseController{
 		}
 		if(dir.equals("root")){
 			dir = "/"+name;
+		}else{
+			dir = "/"+dir;
 		}
 		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getServletContext());
 		if (multipartResolver.isMultipart(request)) {
@@ -114,6 +107,7 @@ public class CloudController extends BaseController{
 			Map<String, MultipartFile> fms = multipartRequest.getFileMap();
 			for (Map.Entry<String, MultipartFile> entity : fms.entrySet()) {
 				MultipartFile mf = entity.getValue();
+				System.out.println(mf.getSize());
 				InputStream in = mf.getInputStream();
 				hdfsDB.upload(in, dir+"/"+mf.getOriginalFilename());
 				long id = db.getGid();
@@ -121,9 +115,32 @@ public class CloudController extends BaseController{
 				db.add("filesystem", id, "files", "dir", dir);
 				db.add("filesystem", id, "files", "pdir", dir.substring(0, dir.lastIndexOf("/")));
 				db.add("filesystem", id, "files", "type", "F");
+				db.add("filesystem", id, "files", "size", BaseUtils.FormetFileSize(mf.getSize()));
 				in.close();
+				json.setSuccess(true);
 			}
 		}
-		return null;
+		return json;
 	}
+	@ResponseBody
+	@RequestMapping("/delete")
+	public Json delete(FileSystemVo fs) throws Exception {
+		Json json = new Json();
+		String[] ss = fs.getIds().split(",");
+		try {
+			db.deleteRow("filesystem", ss);
+			String[] ns = fs.getNames().split(",");
+			String[] ds = fs.getDirs().split(",");
+			for (int i = 0; i < ds.length; i++) {
+				hdfsDB.delete(ds[i]+"/"+ns[i]);
+			}
+			json.setSuccess(true);
+			json.setMsg("删除成功");
+		} catch (Exception e) {
+			json.setMsg("删除失败");
+			e.printStackTrace();
+		}
+		return json;
+	}
+	
 }

@@ -27,9 +27,11 @@ import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.QualifierFilter;
+import org.apache.hadoop.hbase.filter.SubstringComparator;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import com.weirq.util.DateUtil;
+import com.weirq.util.SiteUrl;
 import com.weirq.vo.FileSystemVo;
 import com.weirq.vo.Menu;
 
@@ -46,7 +48,7 @@ public class HbaseDB  implements Serializable{
 	}
 	private HbaseDB() {
 		Configuration conf = HBaseConfiguration.create();
-		conf.set("hbase.zookeeper.quorum", "h1:9000");
+		conf.set("hbase.zookeeper.quorum", SiteUrl.readUrl("host"));
 		try {
 			connection = HConnectionManager.createConnection(conf);
 		} catch (IOException e) {
@@ -107,43 +109,6 @@ public class HbaseDB  implements Serializable{
 		}
 		admin.close();
 	}
-	/**
-	 * 初始化用户表
-	 * @throws Exception
-	 */
-	public void initTable() throws Exception{
-//		String table_gid = "gid";
-//		String[] fam_gid = {"gid"};
-//		db.createTable(table_gid, fam_gid);
-//		
-//		String table_id = "id_user";
-//		String[] fam_id = {"user"};
-//		db.createTable(table_id, fam_id);
-//		
-//		String table_user = "user_id";
-//		String[] fam_user = {"id"};
-//		db.createTable(table_user, fam_user);
-//		
-//		String table_email = "email_user";
-//		String[] fam_email = {"user"};
-//		db.createTable(table_email, fam_email);
-//		
-//		db.add(table_gid, "gid", "gid", "gid", (long)0);
-		
-	}
-	
-	public void initEmun() throws Exception {
-//		String table_emun = "emun";
-//		String[] fam_emun = {"emun"};
-//		db.createTable(table_emun, fam_emun);
-//		HTable table_gid = new HTable(TableName.valueOf("gid"), connection);
-//		long id = table_gid.incrementColumnValue(Bytes.toBytes("gid"), Bytes.toBytes("gid"), Bytes.toBytes("gid"), 1);
-//		db.add(table_emun, id, "emun", "name", "菜单管理");
-//		db.add(table_emun, id, "emun", "url", "/emun/list.do");
-//		long id02 = table_gid.incrementColumnValue(Bytes.toBytes("gid"), Bytes.toBytes("gid"), Bytes.toBytes("gid"), 1);
-//		db.add(table_emun, id02, "emun", "name", "云盘");
-//		db.add(table_emun, id02, "emun", "url", "/cloud/list.do");
-	}
 	
 	public static long getGid() throws Exception {
 		HTable table_gid = new HTable(TableName.valueOf("gid"), connection);
@@ -151,17 +116,6 @@ public class HbaseDB  implements Serializable{
 		table_gid.close();
 		return id;
 	}
-//	/**
-//	 * 初始化用户
-//	 * @throws Exception
-//	 */
-//	public void initUser() throws Exception{
-//		db.add("user_id", "admin", "id", "id", id);
-//		db.add("id_user", id, "user", "name", "admin");
-//		db.add("id_user", id, "user", "pwd", "336393");
-//		db.add("id_user", id, "user", "email", "634623907@qq.com");
-//		db.add("email_user", "634623907@qq.com", "user", "userid", id);
-//	}
 	
 	/**
 	 * 添加数据
@@ -231,11 +185,20 @@ public class HbaseDB  implements Serializable{
 		table.put(put);
 		table.close();
 	}
-	
-	public static void deleteRow(String tableName, String rowKey) throws Exception {
+	/**
+	 * 根据row删除数据
+	 * @param tableName
+	 * @param rowKey
+	 * @throws Exception
+	 */
+	public static void deleteRow(String tableName, String[] rowKey) throws Exception {
 		HTable table = new HTable(TableName.valueOf(tableName), connection);
-		Delete delete = new Delete(rowKey.getBytes());
-		table.delete(delete);
+		List<Delete> list = new ArrayList<Delete>();
+		for (int i = 0; i < rowKey.length; i++) {
+			Delete delete = new Delete(Bytes.toBytes(Long.valueOf(rowKey[i])));
+			list.add(delete);
+		}
+		table.delete(list);
 		table.close();
 	}
 	
@@ -409,9 +372,6 @@ public class HbaseDB  implements Serializable{
 		HTable table = new HTable(TableName.valueOf("hdfs_cid"), connection);
 		Get get = new Get(Bytes.toBytes(id));
 		Result rs = table.get(get);
-//		for (KeyValue kv : rs.raw()) {
-//			System.out.println(Bytes.toLong(kv.getValue()));
-//		}
 		List<Menu> menus = new ArrayList<Menu>();
 		Menu menu = null;
 		for (Cell cell : rs.rawCells()) {
@@ -428,39 +388,30 @@ public class HbaseDB  implements Serializable{
 			menu = new Menu();
 			menu.setId(Bytes.toString(CellUtil.cloneValue(cell)));
 			menu.setName(name);
-			
-//			if ("D".equals(y)) {
-//				
-//			}else if ("F".equals(y)) {
-//				
-//			}
 		}
-//		List<Cell> cells = rs.listCells();
-//		if (cells!=null) {
-//			for (Cell cell : cells) {
-//				System.out.println(Bytes.toLong(cell.getValueArray()));
-//			}
-//		}
 		table.close();
 	}
 	
 	public static List<FileSystemVo> getFile(String dir) throws Exception {
 		HTable fileTable = new HTable(TableName.valueOf("filesystem"), connection);
 		Scan scan = new Scan();
-		Filter filter = new QualifierFilter(CompareOp.LESS_OR_EQUAL, new BinaryComparator(Bytes.toBytes(dir)));
+		Filter filter = new QualifierFilter(CompareOp.LESS_OR_EQUAL, new SubstringComparator(dir));
 		scan.setFilter(filter);
 		ResultScanner rs = fileTable.getScanner(scan);
 		List<FileSystemVo> fs = new ArrayList<FileSystemVo>();
 		FileSystemVo f = null;
 		for (Result r : rs) {
-			
 			Cell cellName = r.getColumnLatestCell(Bytes.toBytes("files"), Bytes.toBytes("name"));
 			Cell cellPdir = r.getColumnLatestCell(Bytes.toBytes("files"), Bytes.toBytes("pdir"));
 			Cell cellType = r.getColumnLatestCell(Bytes.toBytes("files"), Bytes.toBytes("type"));
+			Cell cellSize = r.getColumnLatestCell(Bytes.toBytes("files"), Bytes.toBytes("size"));
 			f = new FileSystemVo();
 			f.setId(Bytes.toLong(r.getRow()));
 			f.setDir(dir);
 			f.setName(Bytes.toString(CellUtil.cloneValue(cellName)));
+			if (cellSize!=null) {
+				f.setSize(Bytes.toString(CellUtil.cloneValue(cellSize)));
+			}
 			if(cellPdir!=null){
 				f.setPdir(Bytes.toString(CellUtil.cloneValue(cellPdir)));
 			}
@@ -469,65 +420,25 @@ public class HbaseDB  implements Serializable{
 			}
 			f.setDate(DateUtil.longToString("yyyy-MM-dd HH:mm", cellName.getTimestamp()));
 			fs.add(f);
-//			System.out.println(Bytes.toString(CellUtil.cloneValue(cellName)));
-//			System.out.println(Bytes.toString(CellUtil.cloneValue(cellPdir)));
-//			System.out.println(Bytes.toString(CellUtil.cloneValue(cellType)));
 		}
 		fileTable.close();
 		return fs;
 	}
+	public static void delByDir(String dir) throws Exception {
+		HTable fileTable = new HTable(TableName.valueOf("filesystem"), connection);
+		Scan scan = new Scan();
+		Filter filter = new QualifierFilter(CompareOp.LESS_OR_EQUAL, new BinaryComparator(Bytes.toBytes(dir)));
+		scan.setFilter(filter);
+		ResultScanner rs = fileTable.getScanner(scan);
+		for (Result r : rs) {
+			fileTable.delete(new Delete(r.getRow()));
+		}
+		fileTable.close();
+	}
 	
 	public static void main(String[] args) throws Exception {
-		HbaseDB db = new HbaseDB();
+//		HbaseDB db = new HbaseDB();
 		
-//		db.listTable();
-		
-//		db.deleteAllTable();
-//		db.initTable();
-		
-//		db.initUser();
-//		db.queryAll("user_id");
-//		db.initEmun();
-		
-//		String table_hdfs = "hdfs";
-//		String[] fam_hdfs = {"dir"};
-//		db.createTable(table_hdfs, fam_hdfs);
-		
-//		String table_hdfs_name = "hdfs_name";
-//		String[] fam_hdfs_id = {"id"};
-//		db.createTable(table_hdfs_name, fam_hdfs_id);
-//		
-//		String table_hdfs_cid = "hdfs_cid";
-//		String[] fam_cid = {"cid"};
-//		db.createTable(table_hdfs_cid, fam_cid);
-		
-//		System.out.println(db.checkEmail("21212121"));
-		
-//		HTable table_gid = new HTable(TableName.valueOf("gid"), connection);
-//		long id02 = table_gid.incrementColumnValue(Bytes.toBytes("gid"), Bytes.toBytes("gid"), Bytes.toBytes("gid"), 1);
-//		db.add("emun", id02, "emun", "name", "云盘");
-//		db.add("emun", id02, "emun", "url", "/cloud/list.jsp");
-		
-		
-		/*String table_files = "filesystem";
-		String[] fam_file = {"files"};
-		db.createTable(table_files, fam_file);
-		
-		HTable table_gid = new HTable(TableName.valueOf("gid"), connection);
-		
-		long id02 = table_gid.incrementColumnValue(Bytes.toBytes("gid"), Bytes.toBytes("gid"), Bytes.toBytes("gid"), 1);
-		db.add(table_files, id02, "files", "name", "weir01");
-		db.add(table_files, id02, "files", "dir", "weirqq");
-		db.add(table_files, id02, "files", "pdir", "");
-		db.add(table_files, id02, "files", "type", "D");*/
-		
-//		db.getFile("weirqq");
-		
-		
-		
-//		String table_files_id = "files_id";
-//		String[] fam_id = {"id"};
-//		db.createTable(table_files_id, fam_id);
 		System.out.println("ok");
 	}
 }

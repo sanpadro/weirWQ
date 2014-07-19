@@ -8,6 +8,11 @@ public class FileSystemVo {
 	private String pdir;
 	private String type;
 	private String date;
+	private String size;
+	
+	private String ids;
+	private String names;
+	private String dirs;
 	public String getName() {
 		return name;
 	}
@@ -43,5 +48,29 @@ public class FileSystemVo {
 	}
 	public void setId(Long id) {
 		this.id = id;
+	}
+	public String getIds() {
+		return ids;
+	}
+	public void setIds(String ids) {
+		this.ids = ids;
+	}
+	public String getNames() {
+		return names;
+	}
+	public void setNames(String names) {
+		this.names = names;
+	}
+	public String getDirs() {
+		return dirs;
+	}
+	public void setDirs(String dirs) {
+		this.dirs = dirs;
+	}
+	public String getSize() {
+		return size;
+	}
+	public void setSize(String size) {
+		this.size = size;
 	}
 }

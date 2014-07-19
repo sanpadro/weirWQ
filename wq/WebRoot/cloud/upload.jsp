@@ -17,20 +17,23 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <script type="text/javascript">
 var files = [];
 var errors = [];
-var type = 'file';
-var chunk = eval('${param.chunk}');
-var dir = eval('${param.dir}');
-var max_file_size = '5mb';
+//var type = 'file';
+//var chunk = eval('${param.chunk}');
+//var dir = eval('${param.dir}');
+//var max_file_size = '5mb';
 //var filters = {title : "文档", extensions : "zip,doc,docx,xls,xlsx,ppt,pptx"};
 $("#uploader").pluploadQueue($.extend({
 	runtimes : 'flash,html4,html5',
-	url : 'cloud/upload.do',
+	url : '${pageContext.request.contextPath}/cloud/upload.do',
 	//max_file_size : max_file_size,
 	//file_data_name:'file',
 	unique_names:true,
 	//filters : [],
 	flash_swf_url : 'js/Moxie.swf',
 	init:{
+		BeforeUpload: function(uploader, file) {
+        	uploader.setOption('url','${pageContext.request.contextPath}/cloud/upload.do?dir=${param.dir}'); 
+        },
 		FileUploaded:function(uploader,file,response){
 			if(response.response){
 				var rs = $.parseJSON(response.response);
@@ -47,7 +50,7 @@ $("#uploader").pluploadQueue($.extend({
 			target.window("close");
 		}
 	}
-},(chunk ? {chunk_size:'1mb'} : {})));
+}));
 
 </script>
   </body>

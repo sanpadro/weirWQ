@@ -17,6 +17,7 @@ import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.util.Progressable;
 
 import com.weirq.util.DateUtil;
+import com.weirq.util.SiteUrl;
 import com.weirq.vo.HdfsVo;
 import com.weirq.vo.Menu;
 
@@ -35,7 +36,7 @@ public class HdfsDB {
 
 	private HdfsDB() {
 		Configuration conf = new Configuration();
-		conf.set("fs.defaultFS", "hdfs://h1:9000");
+		conf.set("fs.defaultFS", SiteUrl.readUrl("hdfs"));
 		try {
 			fs = FileSystem.get(conf);
 		} catch (IOException e) {
@@ -68,6 +69,10 @@ public class HdfsDB {
 		if (!fs.exists(new Path(dir))) {
 			fs.mkdirs(new Path(dir));
 		}
+	}
+	
+	public void delete(String name) throws Exception {
+		fs.delete(new Path(name), true);
 	}
 
 	public List<HdfsVo> queryAll(String dir) throws Exception {
@@ -118,11 +123,13 @@ public class HdfsDB {
 		// String path = "C://Users//Administrator//Desktop//jeeshop-jeeshop-master.zip";
 		// hdfsDB.upload(path, "weir/"+"jeeshop.zip");
 		// hdfsDB.queryAll(ROOT);
-		hdfsDB.visitPath("hdfs://h1:9000/weir");
-		for (Menu menu : menus) {
-			System.out.println(menu.getName());
-			System.out.println(menu.getPname());
-		}
+//		hdfsDB.visitPath("hdfs://h1:9000/weir");
+//		for (Menu menu : menus) {
+//			System.out.println(menu.getName());
+//			System.out.println(menu.getPname());
+//		}
+//		hdfsDB.delete("weirqq");
+		hdfsDB.mkdir("/weirqq");
 		System.out.println("ok");
 	}
 }

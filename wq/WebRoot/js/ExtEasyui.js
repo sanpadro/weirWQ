@@ -1,12 +1,12 @@
 /**
  * 创建上传窗口 公共方法
- * @param chunk 是否分割大文件
+ * @param dir 目录
  * @param callBack 上传成功之后的回调
  */
-function Uploader(chunk,callBack){
+function Uploader(dir,callBack){
 	var addWin = $('<div style="overflow: hidden;"/>');
 	var upladoer = $('<iframe/>');
-	upladoer.attr({'src':'/wq/cloud/upload.jsp?chunk='+chunk,width:'100%',height:'100%',frameborder:'0',scrolling:'no'});
+	upladoer.attr({'src':'/wq/cloud/upload.jsp?dir='+dir,width:'100%',height:'100%',frameborder:'0',scrolling:'no'});
 	addWin.window({
 		title:"上传文件",
 		height:350,
@@ -24,9 +24,6 @@ function Uploader(chunk,callBack){
 			if(files.lenght>0){
 				callBack.call(this,files);
 			}
-			//console.info(fw.files);
-			
-			
 		},
 		onOpen:function(){
 			var target = $(this);
