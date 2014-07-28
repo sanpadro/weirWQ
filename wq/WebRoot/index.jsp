@@ -300,7 +300,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								<li class="divider"></li>
 
 								<li>
-									<a href="#">
+									<a href="logout.do">
 										<i class="icon-off"></i>
 										退出
 									</a>
@@ -359,7 +359,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 					<ul class="nav nav-list">
 						<li class="active">
-							<a href="index.html">
+							<a href="index.jsp">
 								<i class="icon-dashboard"></i>
 								<span class="menu-text"> 欢迎页面 </span>
 							</a>
@@ -372,36 +372,25 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							</a>
 						</li>
 
-
-
-
 						<li>
-							<a href="widgets.html">
+							<a href="user/followlist.do">
 								<i class="icon-list-alt"></i>
-								<span class="menu-text"> 插件 </span>
+								<span class="menu-text"> 关注用户 </span>
 							</a>
 						</li>
 
 						<li>
-							<a href="calendar.html">
+							<a href="cloud/getshare.do">
 								<i class="icon-calendar"></i>
-
-								<span class="menu-text">
-									日历
-									<span class="badge badge-transparent tooltip-error" title="2&nbsp;Important&nbsp;Events">
-										<i class="icon-warning-sign red bigger-130"></i>
-									</span>
-								</span>
+								<span class="menu-text"> 我的分享</span>
 							</a>
 						</li>
-
 						<li>
-							<a href="gallery.html">
-								<i class="icon-picture"></i>
-								<span class="menu-text"> 相册 </span>
+							<a href="cloud/getshareed.do">
+								<i class="icon-calendar"></i>
+								<span class="menu-text"> 收到分享</span>
 							</a>
 						</li>
-
 
 					</ul><!-- /.nav-list -->
 

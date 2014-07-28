@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.weirq.mvc.BaseController;
+import com.weirq.util.BaseUtils;
 import com.weirq.util.Json;
 
 @Controller
@@ -30,40 +31,55 @@ public class LoginController extends BaseController {
 		if (session!=null) {
 			session.invalidate();
 		}
-		return "redirect:index.jsp";
+		return "redirect:login.jsp";
+	}
+	
+	@RequestMapping("reg")
+	public String reg(String email,String username,String password) throws Exception {
+		if(BaseUtils.isNotEmpty(email) && BaseUtils.isNotEmpty(username) && BaseUtils.isNotEmpty(password)){
+			long id = db.getGid("gid");
+			db.add("user_id", username, "id", "id", id);
+			db.add("id_user", id, "user", "name", username);
+			db.add("id_user", id, "user", "pwd", password);
+			db.add("id_user", id, "user", "email", email);
+			db.add("email_user", email, "user", "userid", id);
+			hdfsDB.mkdir("/"+username);
+		}
+		return "redirect:login.jsp";
 	}
 	
 	@RequestMapping("init")
 	public String init() throws Exception {
-//		String table_gid = "gid";
-//		String[] fam_gid = {"gid"};
-//		db.createTable(table_gid, fam_gid);
-//		
-//		String table_id = "id_user";
-//		String[] fam_id = {"user"};
-//		db.createTable(table_id, fam_id);
-//		
-//		String table_user = "user_id";
-//		String[] fam_user = {"id"};
-//		db.createTable(table_user, fam_user);
-//		
-//		String table_email = "email_user";
-//		String[] fam_email = {"user"};
-//		db.createTable(table_email, fam_email);
-//		
-//		db.add(table_gid, "gid", "gid", "gid", (long)0);
-//		
-//		long id = db.getGid();
-//		db.add("user_id", "admin", "id", "id", id);
-//		db.add("id_user", id, "user", "name", "admin");
-//		db.add("id_user", id, "user", "pwd", "336393");
-//		db.add("id_user", id, "user", "email", "634623907@qq.com");
-//		db.add("email_user", "634623907@qq.com", "user", "userid", id);
-//		
-//		
+		/*String table_gid = "gid";
+		String[] fam_gid = {"gid"};
+		db.createTable(table_gid, fam_gid,1);
+		
+		String table_id = "id_user";
+		String[] fam_id = {"user"};
+		db.createTable(table_id, fam_id,1);
+		
+		String table_user = "user_id";
+		String[] fam_user = {"id"};
+		db.createTable(table_user, fam_user,1);
+		
+		String table_email = "email_user";
+		String[] fam_email = {"user"};
+		db.createTable(table_email, fam_email,1);
+		
+		db.add(table_gid, "gid", "gid", "gid", (long)0);
+		
+		long id = db.getGid();
+		db.add("user_id", "admin", "id", "id", id);
+		db.add("id_user", id, "user", "name", "admin");
+		db.add("id_user", id, "user", "pwd", "336393");
+		db.add("id_user", id, "user", "email", "634623907@qq.com");
+		db.add("email_user", "634623907@qq.com", "user", "userid", id);
+		
+		hdfsDB.mkdir("/admin");*/
+		
 //		String table_emun = "emun";
 //		String[] fam_emun = {"emun"};
-//		db.createTable(table_emun, fam_emun);
+//		db.createTable(table_emun, fam_emun,1);
 //		
 //		long id1 = db.getGid();
 //		db.add(table_emun, id1, "emun", "name", "菜单管理");
@@ -71,17 +87,46 @@ public class LoginController extends BaseController {
 //		long id02 = db.getGid();
 //		db.add(table_emun, id02, "emun", "name", "云盘");
 //		db.add(table_emun, id02, "emun", "url", "/cloud/list.do");
-//		
-//		
+		
 //		String table_files = "filesystem";
 //		String[] fam_file = {"files"};
-//		db.createTable(table_files, fam_file);
+//		db.createTable(table_files, fam_file,1);
 //		
 //		long id03 = db.getGid();
 //		db.add(table_files, id03, "files", "name", "admin");
-//		db.add(table_files, id03, "files", "dir", "admin");
-//		db.add(table_files, id03, "files", "pdir", "/");
-//		db.add(table_files, id03, "files", "type", "D");
+//		db.add(table_files, id03, "files", "dir", "/");
+//		db.add(table_files, id03, "files", "pdir", "");
+//		db.add(table_files, id03, "files", "type", "D");*/
+//		hdfsDB.mkdir("/admin");
+		
+		
+		/*String table_follow = "follow";
+		String[] fam_follow_name = {"name"};
+		db.createTable(table_follow, fam_follow_name,1);
+		
+		String table_followed = "followed";
+		String[] fam_followed_userid = {"userid"};
+		db.createTable(table_followed, fam_followed_userid,1);*/
+		
+		//db.add("gid", "shareid", "gid", "shareid", (long)0);
+		/*
+		 * tableName:share
+		 * rowkey:userid+shareid
+		 * content:path,content:ts
+		 * 
+		String table_share = "share";
+		String[] fam_centent = {"content"};
+		db.createTable(table_share, fam_centent,1);
+		
+		
+		 * tableName:shareed
+		 * rowkey:userid+userid+shareid
+		 * shareid:
+		 * 
+		String table_shareed = "shareed";
+		String[] fam_shareid = {"shareid"};
+		db.createTable(table_shareed, fam_shareid,1);*/
+		
 		return "redirect:login.jsp";
 	}
 }

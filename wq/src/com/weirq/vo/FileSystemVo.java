@@ -13,6 +13,9 @@ public class FileSystemVo {
 	private String ids;
 	private String names;
 	private String dirs;
+	
+	private String namep;
+	
 	public String getName() {
 		return name;
 	}
@@ -72,5 +75,11 @@ public class FileSystemVo {
 	}
 	public void setSize(String size) {
 		this.size = size;
+	}
+	public String getNamep() {
+		return namep;
+	}
+	public void setNamep(String namep) {
+		this.namep = namep;
 	}
 }

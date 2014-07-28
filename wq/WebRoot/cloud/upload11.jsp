@@ -9,7 +9,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   <head>
     <base href="<%=basePath%>">
 <link rel="stylesheet" href="js/plupload-2.1.2/js/jquery.plupload.queue/css/jquery.plupload.queue.css" type="text/css" media="screen" />
-<script src="js/jquery.min.js"></script>
+<script src="js/jquery-1.11.1.min.js"></script>
 <script type="text/javascript" src="js/plupload-2.1.2/js/plupload.full.min.js"></script>
 <script type="text/javascript" src="js/plupload-2.1.2/js/jquery.plupload.queue/jquery.plupload.queue.min.js"></script>
 <script type="text/javascript" src="js/plupload-2.1.2/js/i18n/zh_CN.js"></script>

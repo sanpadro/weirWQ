@@ -159,27 +159,22 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 											<i class="icon-group blue"></i> 注册用户
 										</h4>
 
-										<form>
+										<form action="reg.do" method="post">
 											<fieldset>
 												<label class="block clearfix"> <span
 													class="block input-icon input-icon-right"> <input
-														type="email" class="form-control" placeholder="邮箱" /> <i
+														type="email" name="email" class="form-control" placeholder="邮箱" /> <i
 														class="icon-envelope"></i>
 												</span>
 												</label> <label class="block clearfix"> <span
 													class="block input-icon input-icon-right"> <input
-														type="text" class="form-control" placeholder="用户名" /> <i
+														type="text" name="username" class="form-control" placeholder="用户名" /> <i
 														class="icon-user"></i>
 												</span>
 												</label> <label class="block clearfix"> <span
 													class="block input-icon input-icon-right"> <input
-														type="password" class="form-control" placeholder="密码" />
+														type="password" name="password" class="form-control" placeholder="密码" />
 														<i class="icon-lock"></i>
-												</span>
-												</label> <label class="block clearfix"> <span
-													class="block input-icon input-icon-right"> <input
-														type="password" class="form-control" placeholder="确认密码" />
-														<i class="icon-retweet"></i>
 												</span>
 												</label>
 
@@ -190,7 +185,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 														<i class="icon-refresh"></i> 重置
 													</button>
 
-													<button type="button"
+													<button type="submit"
 														class="width-65 pull-right btn btn-sm btn-success">
 														注册 <i class="icon-arrow-right icon-on-right"></i>
 													</button>

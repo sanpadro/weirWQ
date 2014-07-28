@@ -3,7 +3,10 @@ package com.weirq.db;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.Cell;
@@ -34,6 +37,7 @@ import com.weirq.util.DateUtil;
 import com.weirq.util.SiteUrl;
 import com.weirq.vo.FileSystemVo;
 import com.weirq.vo.Menu;
+import com.weirq.vo.ShareVo;
 
 
 public class HbaseDB  implements Serializable{
@@ -88,17 +92,21 @@ public class HbaseDB  implements Serializable{
 	 * @param fams
 	 * @throws Exception
 	 */
-	public static void createTable(String tableName,String[] fams) throws Exception {
+	public static void createTable(String tableName,String[] fams,int version) throws Exception {
 		HBaseAdmin admin = new HBaseAdmin(connection);
 		if (admin.tableExists(tableName)) {
 			admin.disableTable(tableName);
 			admin.deleteTable(tableName);
 		}
-		HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(tableName));
+		HTableDescriptor tableDescriptor = null;
+		HColumnDescriptor hd = null;
 		for (int i = 0; i < fams.length; i++) {
-			tableDescriptor.addFamily(new HColumnDescriptor(fams[i]));
+			tableDescriptor = new HTableDescriptor(TableName.valueOf(tableName));
+			hd = new HColumnDescriptor(fams[i]);
+			hd.setMaxVersions(version);
+			tableDescriptor.addFamily(hd);
+			admin.createTable(tableDescriptor);
 		}
-		admin.createTable(tableDescriptor);
 		admin.close();
 	}
 	public static void delTable(String tableName) throws Exception {
@@ -110,9 +118,9 @@ public class HbaseDB  implements Serializable{
 		admin.close();
 	}
 	
-	public static long getGid() throws Exception {
+	public static long getGid(String row) throws Exception {
 		HTable table_gid = new HTable(TableName.valueOf("gid"), connection);
-		long id = table_gid.incrementColumnValue(Bytes.toBytes("gid"), Bytes.toBytes("gid"), Bytes.toBytes("gid"), 1);
+		long id = table_gid.incrementColumnValue(Bytes.toBytes(row), Bytes.toBytes("gid"), Bytes.toBytes(row), 1);
 		table_gid.close();
 		return id;
 	}
@@ -131,6 +139,86 @@ public class HbaseDB  implements Serializable{
 		HTable table = new HTable(TableName.valueOf(tableName), connection);
 		Put put = new Put(Bytes.toBytes(rowKey));
 		put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+		table.put(put);
+		table.close();
+	}
+	/**
+	 * 添加数据
+	 * @param tableName
+	 * @param rowKey
+	 * @param family
+	 * @param qualifier
+	 * @param value
+	 * @throws IOException
+	 */
+	public static void add(String tableName, Long rowKey, String family, Long qualifier, String value) throws IOException {
+		//连接到table
+		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Put put = new Put(Bytes.toBytes(rowKey));
+		put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+		table.put(put);
+		table.close();
+	}
+	/**
+	 * 添加数据
+	 * @param tableName
+	 * @param rowKey
+	 * @param family
+	 * @param qualifier
+	 * @param value
+	 * @throws IOException
+	 */
+	public static void add(String tableName, Long rowKey01,Long rowKey02, String family, String qualifier, Long value) throws IOException {
+		//连接到table
+		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Put put = new Put(Bytes.add(Bytes.toBytes(rowKey01), Bytes.toBytes(rowKey02)));
+		if (qualifier!=null) {
+			put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+		}else{
+			put.add(Bytes.toBytes(family), null, Bytes.toBytes(value));
+		}
+		table.put(put);
+		table.close();
+	}
+	/**
+	 * 添加数据
+	 * @param tableName
+	 * @param rowKey
+	 * @param family
+	 * @param qualifier
+	 * @param value
+	 * @throws IOException
+	 */
+	public static void add(String tableName, Long rowKey01,Long rowKey02,Long rowKey03, String family, String qualifier, Long value01, Long value02) throws IOException {
+		//连接到table
+		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Put put = new Put(Bytes.add(Bytes.toBytes(rowKey01), Bytes.toBytes(rowKey02), Bytes.toBytes(rowKey03)));
+		if (qualifier!=null) {
+			put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.add(Bytes.toBytes(value01), Bytes.toBytes(value02)));
+		}else{
+			put.add(Bytes.toBytes(family), null, Bytes.add(Bytes.toBytes(value01), Bytes.toBytes(value02)));
+		}
+		table.put(put);
+		table.close();
+	}
+	/**
+	 * 添加数据
+	 * @param tableName
+	 * @param rowKey
+	 * @param family
+	 * @param qualifier
+	 * @param value
+	 * @throws IOException
+	 */
+	public static void add(String tableName, Long rowKey01,Long rowKey02, String family, String qualifier, String value) throws IOException {
+		//连接到table
+		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Put put = new Put(Bytes.add(Bytes.toBytes(rowKey01), Bytes.toBytes(rowKey02)));
+		if (qualifier!=null) {
+			put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+		}else{
+			put.add(Bytes.toBytes(family), null, Bytes.toBytes(value));
+		}
 		table.put(put);
 		table.close();
 	}
@@ -202,11 +290,25 @@ public class HbaseDB  implements Serializable{
 		table.close();
 	}
 	
+	public static void deleteColumns(String tableName,Long rowKey,String family, Long qualifier) throws Exception {
+		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Delete delete = new Delete(Bytes.toBytes(rowKey));
+		delete.deleteColumns(Bytes.toBytes(family), Bytes.toBytes(qualifier));
+		table.delete(delete);
+		table.close();
+	}
+	public static void deleteRow(String tableName,Long rowKey01,Long rowKey02) throws Exception {
+		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Delete delete = new Delete(Bytes.add(Bytes.toBytes(rowKey01), Bytes.toBytes(rowKey02)));
+		table.delete(delete);
+		table.close();
+	}
+	
 	public static long getIdByUsername(String name) {
 		long id = 0;
 		try {
 			HTable table = new HTable(TableName.valueOf("user_id"), connection);
-			Get get = new Get(name.getBytes());
+			Get get = new Get(Bytes.toBytes(name));
 			get.addColumn(Bytes.toBytes("id"), Bytes.toBytes("id"));
 			Result rs = table.get(get);
 			byte[] value = rs.getValue(Bytes.toBytes("id"), Bytes.toBytes("id"));
@@ -218,22 +320,22 @@ public class HbaseDB  implements Serializable{
 		}
 		return id;
 	}
-	public static boolean checkUsername(String name) {
+	public boolean checkUsername(String name) {
 		try {
 			HTable table = new HTable(TableName.valueOf("user_id"), connection);
-			Get get = new Get(name.getBytes());
-			get.addColumn(Bytes.toBytes("id"), Bytes.toBytes("id"));
-			Result rs = table.get(get);
-			byte[] value = rs.getValue(Bytes.toBytes("id"), Bytes.toBytes("id"));
-			table.close();
-			if (value!=null) {
+			Get get = new Get(Bytes.toBytes(name));
+			table.exists(get);
+			if (table.exists(get)) {
+				table.close();
 				return true;
+			}else{
+				table.close();
+				return false;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
-		return false;
 	}
 	
 	public static String getUserNameById(long id) {
@@ -434,6 +536,131 @@ public class HbaseDB  implements Serializable{
 			fileTable.delete(new Delete(r.getRow()));
 		}
 		fileTable.close();
+	}
+	
+	public boolean follow(String oname,String dname) throws Exception {
+		long oid = this.getIdByUsername(oname);
+		long did = this.getIdByUsername(dname);
+		if (oid == 0 || did == 0 || oid == did){
+			return false;
+		}
+		this.add("follow", oid, "name", did, dname);
+		
+		this.add("followed", did, oid, "userid", null, oid);
+		return true;
+	}
+	public boolean unfollow(String oname,String dname) throws Exception {
+		long oid = this.getIdByUsername(oname);
+		long did = this.getIdByUsername(dname);
+		if (oid == 0 || did == 0 || oid == did){
+			return false;
+		}
+		this.deleteColumns("follow", oid, "name", did);
+		
+		this.deleteRow("followed", did, oid);
+		return true;
+	}
+	/**
+	 * 获取关注的用户
+	 * @param username
+	 * @return
+	 * @throws Exception
+	 */
+	public Set<String> getFollow(String username) throws Exception {
+		Set<String> set = new HashSet<String>();
+		long id = this.getIdByUsername(username);
+		HTable table = new HTable(TableName.valueOf("follow"), connection);
+		Get get = new Get(Bytes.toBytes(id));
+		Result rs = table.get(get);
+		for (Cell cell : rs.rawCells()) {
+			set.add(Bytes.toString(CellUtil.cloneValue(cell)));
+		}
+		return set;
+	}
+	/**
+	 * 分享文件及文件夹
+	 * @param username
+	 * @param path
+	 * @param shareusername
+	 * @throws Exception
+	 */
+	public void share(String dir,String username,String[] path,String[] type,String shareusername) throws Exception {
+		long uid = getIdByUsername(username);
+		for (int i = 0; i < path.length; i++) {
+			long id = getGid("shareid");
+			add("share", uid,id, "content", "dir", dir);
+			add("share", uid,id, "content", "type", type[i]);
+			add("share", uid,id, "content", "path", path[i]);
+			add("share", uid,id, "content", "ts", DateUtil.DateToString("yyyy-MM-dd HH:mm", new Date()));
+			
+			long suid = getIdByUsername(shareusername);
+			add("shareed", suid,uid,id, "shareid", null, uid,id);
+		}
+	}
+	/**
+	 * 分享列表
+	 * @param name
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ShareVo> getshare(String name) throws Exception {
+		long uid = getIdByUsername(name);
+		Scan scan = new Scan();
+		scan.setStartRow(Bytes.toBytes(uid));
+		scan.setStopRow(Bytes.toBytes(uid+1));
+		HTable share_table = new HTable(TableName.valueOf("share"), connection);
+		ResultScanner rs = share_table.getScanner(scan);
+		List<ShareVo> shareVos = new ArrayList<ShareVo>();
+		ShareVo share = null;
+		for (Result r : rs) {
+			Cell cellPath = r.getColumnLatestCell(Bytes.toBytes("content"), Bytes.toBytes("path"));
+			Cell cellTs = r.getColumnLatestCell(Bytes.toBytes("content"), Bytes.toBytes("ts"));
+			Cell cellType = r.getColumnLatestCell(Bytes.toBytes("content"), Bytes.toBytes("type"));
+			Cell cellDir = r.getColumnLatestCell(Bytes.toBytes("content"), Bytes.toBytes("dir"));
+			share = new ShareVo();
+			share.setShareid(Bytes.toString(r.getRow()));
+			share.setPath(Bytes.toString(CellUtil.cloneValue(cellPath)));
+			share.setTs(Bytes.toString(CellUtil.cloneValue(cellTs)));
+			share.setType(Bytes.toString(CellUtil.cloneValue(cellType)));
+			share.setDir(Bytes.toString(CellUtil.cloneValue(cellDir)));
+			shareVos.add(share);
+		}
+		share_table.close();
+		return shareVos;
+	}
+	/**
+	 * 被分享
+	 * @param username
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ShareVo> getshareed(String username) throws Exception {
+		long uid = getIdByUsername(username);
+		Scan scan = new Scan();
+		scan.setStartRow(Bytes.toBytes(uid));
+		scan.setStopRow(Bytes.toBytes(uid+1));
+		HTable shareed_table = new HTable(TableName.valueOf("shareed"), connection);
+		ResultScanner rs = shareed_table.getScanner(scan);
+		HTable share_table = new HTable(TableName.valueOf("share"), connection);
+		List<ShareVo> shareVos = new ArrayList<ShareVo>();
+		ShareVo share = null;
+		for (Result r : rs) {
+			Result shareRs = share_table.get(new Get(r.getValue(Bytes.toBytes("shareid"), null)));
+			Cell cellPath = shareRs.getColumnLatestCell(Bytes.toBytes("content"), Bytes.toBytes("path"));
+			Cell cellTs = shareRs.getColumnLatestCell(Bytes.toBytes("content"), Bytes.toBytes("ts"));
+			Cell cellType = shareRs.getColumnLatestCell(Bytes.toBytes("content"), Bytes.toBytes("type"));
+			Cell cellDir = shareRs.getColumnLatestCell(Bytes.toBytes("content"), Bytes.toBytes("dir"));
+			share = new ShareVo();
+			share.setShareid(Bytes.toString(shareRs.getRow()));
+			share.setPath(Bytes.toString(CellUtil.cloneValue(cellPath)));
+			share.setTs(Bytes.toString(CellUtil.cloneValue(cellTs)));
+			share.setType(Bytes.toString(CellUtil.cloneValue(cellType)));
+			share.setDir(Bytes.toString(CellUtil.cloneValue(cellDir)));
+			shareVos.add(share);
+		}
+		share_table.close();
+		shareed_table.close();
+		return shareVos;
 	}
 	
 	public static void main(String[] args) throws Exception {

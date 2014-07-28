@@ -1,10 +1,14 @@
 package com.weirq.mvc.sys;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.weirq.mvc.BaseController;
+import com.weirq.util.BaseUtils;
 import com.weirq.util.Json;
 
 @Controller
@@ -24,7 +28,7 @@ public class UserController extends BaseController{
 			return json;
 		}
 		try {
-			long id = db.getGid();
+			long id = db.getGid("gid");
 			//创建用户
 			db.add("user_id", userName, "id", "id", id);
 			db.add("id_user", id, "user", "name", userName);
@@ -42,6 +46,89 @@ public class UserController extends BaseController{
 		} catch (Exception e) {
 			e.printStackTrace();
 			json.setMsg("用户注册失败");
+		}
+		return json;
+	}
+	/**
+	 * 获取关注的用户
+	 * @param session
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/followlist")
+	public String followlist(HttpSession session,Model model) throws Exception {
+		String name = (String) session.getAttribute("username");
+		if (name!=null) {
+			model.addAttribute("follows", db.getFollow(name));
+		}
+		return "cloud/follow";
+	}
+	@RequestMapping("/getFollow")
+	public String getFollow(String ids,String dir,String types,HttpSession session,Model model) throws Exception {
+		String name = (String) session.getAttribute("username");
+		if (name!=null) {
+			model.addAttribute("follows", db.getFollow(name));
+		}
+		model.addAttribute("dir", dir);
+		model.addAttribute("ids", ids);
+		model.addAttribute("types", types);
+		return "cloud/share_getfollow";
+	}
+	/**
+	 * 关注用户
+	 * @param username
+	 * @param session
+	 * @throws Exception
+	 */
+	@ResponseBody
+	@RequestMapping("/follow")
+	public Json follow(String username,HttpSession session) throws Exception {
+		Json json = new Json();
+		String name = (String) session.getAttribute("username");
+		if (name!=null && BaseUtils.isNotEmpty(username)) {
+			try {
+				db.follow(name, username);
+				json.setSuccess(true);
+			} catch (Exception e) {
+				json.setMsg("关注失败");
+				e.printStackTrace();
+			}
+		}
+		return json;
+	}
+	/**
+	 * 取消关注
+	 * @param username
+	 * @param session
+	 * @throws Exception
+	 */
+	@ResponseBody
+	@RequestMapping("/unfollow")
+	public Json unfollow(String username,HttpSession session) throws Exception {
+		Json json = new Json();
+		String name = (String) session.getAttribute("username");
+		if (name!=null && BaseUtils.isNotEmpty(username)) {
+			try {
+				db.unfollow(name, username);
+				json.setSuccess(true);
+			} catch (Exception e) {
+				json.setMsg("取消失败");
+				e.printStackTrace();
+			}
+		}
+		return json;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/getuser")
+	public Json getuser(String username) {
+		Json json = new Json();
+		if (db.checkUsername(username)) {
+			json.setSuccess(true);
+			json.setMsg(username);
+		}else{
+			json.setMsg("没有该用户");
 		}
 		return json;
 	}

@@ -1,4 +1,4 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page language="java" pageEncoding="UTF-8"%>
 <%@ include file="/taglib.jsp"%>
 <%
 String path = request.getContextPath();
@@ -19,7 +19,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		  <link rel="stylesheet" href="assets/css/font-awesome-ie7.min.css" />
 		<![endif]-->
 
-
+<link rel="stylesheet" href="assets/css/jquery-ui-1.10.3.full.min.css" />
 <!-- ace styles -->
 
 <link rel="stylesheet" href="assets/css/ace.min.css" />
@@ -45,6 +45,49 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<script src="assets/js/html5shiv.js"></script>
 		<script src="assets/js/respond.min.js"></script>
 		<![endif]-->
+<!-- basic scripts -->
+
+<!--[if !IE]> -->
+
+<script src="js/jquery-2.1.1.min.js"></script>
+
+<!-- <![endif]-->
+
+<!--[if IE]>
+<script src="js/jquery-1.11.1.min.js"></script>
+<![endif]-->
+
+<!--[if !IE]> -->
+
+<script type="text/javascript">
+			window.jQuery || document.write("<script src='js/jquery-2.1.1.min.js'>"+"<"+"script>");
+		</script>
+
+<!-- <![endif]-->
+
+<!--[if IE]>
+<script type="text/javascript">
+ window.jQuery || document.write("<script src='js/jquery-1.11.1.min.js'>"+"<"+"script>");
+</script>
+<![endif]-->
+<script type="text/javascript" src="js/jquery.form.js"></script>
+<script type="text/javascript" src="js/easyui1.3.6/jquery.easyui.min.js"></script>
+
+<script type="text/javascript">
+			if("ontouchend" in document) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"script>");
+		</script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/typeahead-bs2.min.js"></script>
+
+<!-- page specific plugin scripts -->
+
+<!--[if lte IE 8]>
+		  <script src="assets/js/excanvas.min.js"></script>
+		<![endif]-->
+<script src="assets/js/jquery-ui-1.10.3.full.min.js"></script>
+<script src="assets/js/jquery.ui.touch-punch.min.js"></script>
+<script type="text/javascript" src="js/layer/layer.min.js"></script>
+
 </head>
 
 <body>
@@ -55,8 +98,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 		<div class="navbar-container" id="navbar-container">
 			<div class="navbar-header pull-left">
-				<a href="#" class="navbar-brand"> <small> <i
-						class="icon-leaf"></i> 云盘
+				<a href="#" class="navbar-brand"> <small> <i class="icon-leaf"></i> 云盘
 				</small>
 				</a>
 				<!-- /.brand -->
@@ -65,15 +107,11 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 			<div class="navbar-header pull-right" role="navigation">
 				<ul class="nav ace-nav">
-					<li class="grey"><a data-toggle="dropdown"
-						class="dropdown-toggle" href="#"> <i class="icon-tasks"></i> <span
-							class="badge badge-grey">4</span>
+					<li class="grey"><a data-toggle="dropdown" class="dropdown-toggle" href="#"> <i class="icon-tasks"></i> <span class="badge badge-grey">4</span>
 					</a>
 
-						<ul
-							class="pull-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
-							<li class="dropdown-header"><i class="icon-ok"></i> 还有4个任务完成
-							</li>
+						<ul class="pull-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
+							<li class="dropdown-header"><i class="icon-ok"></i> 还有4个任务完成</li>
 
 							<li><a href="#">
 									<div class="clearfix">
@@ -91,8 +129,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 									</div>
 
 									<div class="progress progress-mini ">
-										<div style="width:35%"
-											class="progress-bar progress-bar-danger"></div>
+										<div style="width:35%" class="progress-bar progress-bar-danger"></div>
 									</div>
 							</a></li>
 
@@ -102,8 +139,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 									</div>
 
 									<div class="progress progress-mini ">
-										<div style="width:15%"
-											class="progress-bar progress-bar-warning"></div>
+										<div style="width:15%" class="progress-bar progress-bar-warning"></div>
 									</div>
 							</a></li>
 
@@ -113,8 +149,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 									</div>
 
 									<div class="progress progress-mini progress-striped active">
-										<div style="width:90%"
-											class="progress-bar progress-bar-success"></div>
+										<div style="width:90%" class="progress-bar progress-bar-success"></div>
 									</div>
 							</a></li>
 
@@ -122,42 +157,32 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							</a></li>
 						</ul></li>
 
-					<li class="purple"><a data-toggle="dropdown"
-						class="dropdown-toggle" href="#"> <i
-							class="icon-bell-alt icon-animated-bell"></i> <span
-							class="badge badge-important">8</span>
+					<li class="purple"><a data-toggle="dropdown" class="dropdown-toggle" href="#"> <i class="icon-bell-alt icon-animated-bell"></i> <span class="badge badge-important">8</span>
 					</a>
 
-						<ul
-							class="pull-right dropdown-navbar navbar-pink dropdown-menu dropdown-caret dropdown-close">
-							<li class="dropdown-header"><i class="icon-warning-sign"></i>
-								8条通知</li>
+						<ul class="pull-right dropdown-navbar navbar-pink dropdown-menu dropdown-caret dropdown-close">
+							<li class="dropdown-header"><i class="icon-warning-sign"></i> 8条通知</li>
 
 							<li><a href="#">
 									<div class="clearfix">
-										<span class="pull-left"> <i
-											class="btn btn-xs no-hover btn-pink icon-comment"></i> 新闻评论
+										<span class="pull-left"> <i class="btn btn-xs no-hover btn-pink icon-comment"></i> 新闻评论
 										</span> <span class="pull-right badge badge-info">+12</span>
 									</div>
 							</a></li>
 
-							<li><a href="#"> <i
-									class="btn btn-xs btn-primary icon-user"></i> 切换为编辑登录..
+							<li><a href="#"> <i class="btn btn-xs btn-primary icon-user"></i> 切换为编辑登录..
 							</a></li>
 
 							<li><a href="#">
 									<div class="clearfix">
-										<span class="pull-left"> <i
-											class="btn btn-xs no-hover btn-success icon-shopping-cart"></i>
-											新订单
+										<span class="pull-left"> <i class="btn btn-xs no-hover btn-success icon-shopping-cart"></i> 新订单
 										</span> <span class="pull-right badge badge-success">+8</span>
 									</div>
 							</a></li>
 
 							<li><a href="#">
 									<div class="clearfix">
-										<span class="pull-left"> <i
-											class="btn btn-xs no-hover btn-info icon-twitter"></i> 粉丝
+										<span class="pull-left"> <i class="btn btn-xs no-hover btn-info icon-twitter"></i> 粉丝
 										</span> <span class="pull-right badge badge-info">+11</span>
 									</div>
 							</a></li>
@@ -166,58 +191,39 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							</a></li>
 						</ul></li>
 
-					<li class="green"><a data-toggle="dropdown"
-						class="dropdown-toggle" href="#"> <i
-							class="icon-envelope icon-animated-vertical"></i> <span
-							class="badge badge-success">5</span>
+					<li class="green"><a data-toggle="dropdown" class="dropdown-toggle" href="#"> <i class="icon-envelope icon-animated-vertical"></i> <span class="badge badge-success">5</span>
 					</a>
 
-						<ul
-							class="pull-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
-							<li class="dropdown-header"><i class="icon-envelope-alt"></i>
-								5条消息</li>
+						<ul class="pull-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
+							<li class="dropdown-header"><i class="icon-envelope-alt"></i> 5条消息</li>
 
-							<li><a href="#"> <img src="assets/avatars/avatar.png"
-									class="msg-photo" alt="Alex's Avatar" /> <span
-									class="msg-body"> <span class="msg-title"> <span
-											class="blue">Alex:</span> 不知道写啥 ...
+							<li><a href="#"> <img src="assets/avatars/avatar.png" class="msg-photo" alt="Alex's Avatar" /> <span class="msg-body"> <span class="msg-title"> <span class="blue">Alex:</span> 不知道写啥 ...
 									</span> <span class="msg-time"> <i class="icon-time"></i> <span>1分钟以前</span>
 									</span>
 								</span>
 							</a></li>
 
-							<li><a href="#"> <img src="assets/avatars/avatar3.png"
-									class="msg-photo" alt="Susan's Avatar" /> <span
-									class="msg-body"> <span class="msg-title"> <span
-											class="blue">Susan:</span> 不知道翻译...
+							<li><a href="#"> <img src="assets/avatars/avatar3.png" class="msg-photo" alt="Susan's Avatar" /> <span class="msg-body"> <span class="msg-title"> <span class="blue">Susan:</span> 不知道翻译...
 									</span> <span class="msg-time"> <i class="icon-time"></i> <span>20分钟以前</span>
 									</span>
 								</span>
 							</a></li>
 
-							<li><a href="#"> <img src="assets/avatars/avatar4.png"
-									class="msg-photo" alt="Bob's Avatar" /> <span class="msg-body">
-										<span class="msg-title"> <span class="blue">Bob:</span>
-											到底是不是英文 ...
+							<li><a href="#"> <img src="assets/avatars/avatar4.png" class="msg-photo" alt="Bob's Avatar" /> <span class="msg-body"> <span class="msg-title"> <span class="blue">Bob:</span> 到底是不是英文 ...
 									</span> <span class="msg-time"> <i class="icon-time"></i> <span>下午3:15</span>
 									</span>
 								</span>
 							</a></li>
 
-							<li><a href="inbox.html"> 查看所有消息 <i
-									class="icon-arrow-right"></i>
+							<li><a href="inbox.html"> 查看所有消息 <i class="icon-arrow-right"></i>
 							</a></li>
 						</ul></li>
 
-					<li class="light-blue"><a data-toggle="dropdown" href="#"
-						class="dropdown-toggle"> <img class="nav-user-photo"
-							src="assets/avatars/avatar4.png" alt="Jason's Photo" /> <span
-							class="user-info"> <small>欢迎光临,</small> ${username}
+					<li class="light-blue"><a data-toggle="dropdown" href="#" class="dropdown-toggle"> <img class="nav-user-photo" src="assets/avatars/avatar4.png" alt="Jason's Photo" /> <span class="user-info"> <small>欢迎光临,</small> ${username}
 						</span> <i class="icon-caret-down"></i>
 					</a>
 
-						<ul
-							class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+						<ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
 							<li><a href="#"> <i class="icon-cog"></i> 设置
 							</a></li>
 
@@ -226,7 +232,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 							<li class="divider"></li>
 
-							<li><a href="#"> <i class="icon-off"></i> 退出
+							<li><a href="logout.do"> <i class="icon-off"></i> 退出
 							</a></li>
 						</ul></li>
 				</ul>
@@ -243,8 +249,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</script>
 
 		<div class="main-container-inner">
-			<a class="menu-toggler" id="menu-toggler" href="#"> <span
-				class="menu-text"></span>
+			<a class="menu-toggler" id="menu-toggler" href="#"> <span class="menu-text"></span>
 			</a>
 
 			<div class="sidebar" id="sidebar">
@@ -272,48 +277,42 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					</div>
 
 					<div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
-						<span class="btn btn-success"></span> <span class="btn btn-info"></span>
-
-						<span class="btn btn-warning"></span> <span class="btn btn-danger"></span>
+						<span class="btn btn-success"></span> <span class="btn btn-info"></span> <span class="btn btn-warning"></span> <span class="btn btn-danger"></span>
 					</div>
 				</div>
 				<!-- #sidebar-shortcuts -->
 
 				<ul class="nav nav-list">
-					<li class="active"><a href="index.html"> <i
-							class="icon-dashboard"></i> <span class="menu-text"> 欢迎页面
-						</span>
+					<li class="active"><a href="index.jsp"> <i class="icon-dashboard"></i> <span class="menu-text"> 欢迎页面 </span>
 					</a></li>
 
-					<li><a href="cloud/list.do"> <i class="icon-text-width"></i>
-							<span class="menu-text"> 我的网盘 </span>
+					<li><a href="cloud/list.do"> <i class="icon-text-width"></i> <span class="menu-text"> 我的网盘 </span>
 					</a></li>
-					<li><a href="widgets.html"> <i class="icon-list-alt"></i>
-							<span class="menu-text"> 插件 </span>
-					</a></li>
+					<li><a href="user/followlist.do">
+								<i class="icon-list-alt"></i>
+								<span class="menu-text"> 关注用户 </span>
+							</a></li>
 
-					<li><a href="calendar.html"> <i class="icon-calendar"></i>
+					<li>
+							<a href="cloud/getshare.do">
+								<i class="icon-calendar"></i>
+								<span class="menu-text"> 我的分享</span>
+							</a>
+						</li>
 
-							<span class="menu-text"> 日历 <span
-								class="badge badge-transparent tooltip-error"
-								title="2&nbsp;Important&nbsp;Events"> <i
-									class="icon-warning-sign red bigger-130"></i>
-							</span>
-						</span>
-					</a></li>
-
-					<li><a href="gallery.html"> <i class="icon-picture"></i> <span
-							class="menu-text"> 相册 </span>
-					</a></li>
+					<li>
+							<a href="cloud/getshareed.do">
+								<i class="icon-calendar"></i>
+								<span class="menu-text"> 收到分享</span>
+							</a>
+						</li>
 
 
 				</ul>
 				<!-- /.nav-list -->
 
 				<div class="sidebar-collapse" id="sidebar-collapse">
-					<i class="icon-double-angle-left"
-						data-icon1="icon-double-angle-left"
-						data-icon2="icon-double-angle-right"></i>
+					<i class="icon-double-angle-left" data-icon1="icon-double-angle-left" data-icon2="icon-double-angle-right"></i>
 				</div>
 
 				<script type="text/javascript">
@@ -328,76 +327,268 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						</script>
 
 					<ul class="breadcrumb">
-						<li><i class="icon-home home-icon"></i> <a href="#">首页</a></li>
-						<li class="active">我的网盘</li>
+						<input type="button" class="button purple" value="上传文件" onclick="upload()" />
+						<input type="button" class="button blue" value="创建文件夹" onclick="mkdir()" />
+						<input type="button" class="button darkblue" value="删除" onclick="deldir()" />
+						<input type="button" class="button teal" value="分享" onclick="share()" />
+
+						<!-- <li><i class="icon-home home-icon"></i> <a href="#">首页</a></li>
+						<li class="active">我的网盘</li> -->
 					</ul>
 					<!-- .breadcrumb -->
 
 					<div class="nav-search" id="nav-search">
 						<form class="form-search">
-							<span class="input-icon"> <input type="text"
-								placeholder="Search ..." class="nav-search-input"
-								id="nav-search-input" autocomplete="off" /> <i
-								class="icon-search nav-search-icon"></i>
+							<span class="input-icon"> <input type="text" placeholder="Search ..." class="nav-search-input" id="nav-search-input" autocomplete="off" /> <i class="icon-search nav-search-icon"></i>
 							</span>
 						</form>
 					</div>
 					<!-- #nav-search -->
+
 				</div>
 
 				<div class="page-content">
-					<div class="page-header">
-						<button type="button" class="btn btn-primary">
-						<span class="glyphicon glyphicon-open"></span>
-						上传文件</button>
-						<button class="btn btn-success" type="button" onclick="mkdir()">
-						<span class="glyphicon glyphicon-folder-open"></span>
-						创建文件夹</button>
-						
-						<script type="text/javascript">
+					<script type="text/javascript">
 						   function mkdir(){
 							   var str = '';
-							   str +="<div><input type='text' placeholder='文件名'/>";
-							   str +="<input class='button purple' type='button' value='提交'/>&nbsp;&nbsp;&nbsp;";
-							   str +="<input class='button black' type='button' value='取消'/></div>";
+							   str +="<div><input type='text' id='mkdir' name='mkdir' placeholder='文件名'/>";
+							   str +="<input class='button purple' type='button' onclick='addDir()' value='提交'/>&nbsp;&nbsp;&nbsp;";
+							   str +="<input class='button black' type='button' onclick='removeDir()' value='取消'/></div>";
 							   $("#mkdirForm").append(str);
 						   }
+						   function addDir(){
+							   var mkdir = $.trim($("#mkdir").val());
+							   if(mkdir==null || mkdir==''){
+								   alert("请输入文件夹名称");
+								   return false;
+							   }
+							   var data = $("#mkdirForm").formToArray();
+								$.ajax({
+									type:"POST",
+									url:"cloud/mkdir.do",
+									data:data,
+									dataType:"json",
+									success:function(json){
+										if(json.success){
+											$("#mkdirForm").empty();
+											/* var str = '';
+											str +="<tr>";
+											str +="<td><input type='checkbox' value='"+json.obj.id+"'/>"+json.obj.name+"</td>";
+											str +="<td>文件夹</td>";
+											str +="<td>"+json.obj.date+"</td>";
+											str +="</tr>";
+											$("#listdir tr:eq(0)").before(str); */
+											location.reload();
+										}else{
+											alert(json.msg);
+										}
+										
+									}
+								});
+						   }
+						   function removeDir(){
+							   $("#mkdirForm").empty();
+						   }
+						   function selectBox(){
+							   $("#listdir input[type=checkbox]").each(function(){
+								   if(this.checked==true){
+										this.checked=false;
+									}else{
+										this.checked=true;
+									}
+							   });
+						   }
+						   function deldir(){
+							   var dir = $("#dir").val();
+							   var ids = [];
+							   $("#listdir input[type=checkbox]").each(function(){
+								   if(this.checked==true){
+									   ids.push(this.value);
+									}
+							   });
+							   if(ids.length>0){
+								   $( "#dialog-confirm" ).removeClass('hide').dialog({
+										resizable: false,
+										modal: true,
+										title: "删除提醒",
+										title_html: true,
+										buttons: [
+											{
+												text: "取消",
+												"class" : "btn btn-xs",
+												click: function() {
+													$( this ).dialog( "close" );
+												}
+											},
+											{
+												text: "确定",
+												"class" : "btn btn-primary btn-xs",
+												click: function() {
+													$.post('${pageContext.request.contextPath}/cloud/delete.do', {ids:ids.join(','),dir:dir}, function(j) {
+														if (j.success) {
+															location.reload();
+														}else{
+															alert(json.msg);
+														}
+													}, 'json');
+												}
+											}
+										]
+									});
+							   }else{
+								   alert("你没有选择");
+							   }
+						   }
+						   $(document).ready(function(){
+							   $('table th input:checkbox').on('click' , function(){
+									var that = this;
+									$(this).closest('table').find('tr > td:first-child input:checkbox')
+									.each(function(){
+										this.checked = that.checked;
+										$(this).closest('tr').toggleClass('selected');
+									});
+										
+								});
+						   });
+						   function upload(){
+							   var dir = $("#dir").val();
+							   //console.info(dir);
+							   $.layer({
+								    type: 2,
+								    border: [0],
+								    title: false,
+								    closeBtn: [0, true],
+								    iframe: {src : 'cloud/upload11.jsp?dir='+dir},
+								    area: ['510px', '450px']
+								});
+						   }
+						   function editName(index){
+							   $("#edit01"+index).hide();
+							   $("#edit02"+index).show();
+						   }
+						   function removeBut(index){
+							   $("#edit02"+index).hide();
+							   $("#edit01"+index).show();
+						   }
+						   function renameBut(index,name,type){
+							   var dir = $("#dir").val();
+							   var newname = $.trim($("#rename"+index).val());
+							   if(newname==null || newname==''){
+								   alert("请输入名称");
+								   return false;
+							   }
+							   $.post('${pageContext.request.contextPath}/cloud/rename.do', {dir:dir,name:name,rename:newname,type:type}, function(j) {
+								    if (j.success) {
+										location.reload();
+									}else{
+										alert(json.msg);
+									}
+								}, 'json');
+							   //$("#edit02"+index).hide();
+							   //$("#edit01"+index).show();
+						   }
+						   function viewName(index,name){
+							   var dir = $("#dir").val();
+							   $.layer({
+								    type: 2,
+								    border: [0],
+								    title: false,
+								    closeBtn: [0, true],
+								    iframe: {src : 'cloud/view.do?dir='+dir+'&name='+name},
+								    area: ['950px', '650px']
+								});
+						   }
+						   function share(){
+							   var dir = $("#dir").val();
+							   var ids = [];
+							   var types = [];
+							   $("#listdir input[type=checkbox]").each(function(){
+								   if(this.checked==true){
+									   ids.push(this.value);
+									   types.push($(this).attr("data-type"));
+									}
+							   });
+							   //alert(types);
+							   if(ids.length>0){
+								   $.layer({
+									    type: 2,
+									    border: [0],
+									    title: '选择要分享的用户',
+									    closeBtn: [0, true],
+									    iframe: {src : 'user/getFollow.do?ids='+ids+'&dir='+dir+'&types='+types},
+									    area: ['860px', '400px']
+									});
+							   }else{
+								   alert("你没有选择");
+							   }
+						   }
 						</script>
-						<form action="">
-						<input type="hidden" id="dirname" name="dirname"/>
-						
-						</form>
+					<div class="page-header">
+						<h1>${url}</h1>
 					</div>
 					<!-- /.page-header -->
 
 					<div class="row">
 						<div class="col-xs-12">
+
+							<div id="dialog-confirm" class="hide">
+
+								<p class="bigger-110 bolder center grey">
+									<i class="icon-hand-right blue bigger-120"></i> 你确定要删除么？
+								</p>
+							</div>
 							<!-- PAGE CONTENT BEGINS -->
-							<input type="hidden" id="dir" value="${dir}"/>
-							<table class="table table-hover">
+							<div>
+								<form id="mkdirForm">
+									<input type="hidden" id="dir" name="dirName" value="${dir}" />
+								</form>
+							</div>
+							<table id="sample-table-1" class="table table-striped table-bordered table-hover">
 								<thead>
 									<tr>
+										<th class="center"><label><input type="checkbox" class="ace" autocomplete="off"/> <span class="lbl" ></span> </label></th>
 										<th>文件名</th>
 										<th>大小</th>
 										<th>修改日期</th>
+										<th></th>
 									</tr>
 								</thead>
-								<tbody>
-								  <tr>
-								    <td>
-								     <form id="mkdirForm"></form>
-								    </td>
-								  </tr>
-								</tbody>
-								<tbody>
-									<c:forEach items="${fs}" var="entry">
+								<tbody id="listdir">
+									<c:forEach items="${fs}" var="entry" varStatus="sta">
 										<tr>
-											<td>${entry.name}</td>
-											<td>
-											<c:if test="${entry.type=='D'}">文件夹</c:if>
-											<c:if test="${entry.type=='F'}">${entry.size}</c:if>
+											<td class="center"><label> <input type="checkbox" class="ace" value="${entry.name}" data-type="${entry.type}" autocomplete="off"/> <span class="lbl"></span>
+											</label></td>
+											<td><div id="edit01${sta.index}">
+													<c:if test="${entry.type=='D'}">
+														<a href="cloud/list.do?name=${dir}/${entry.name}">${entry.name}</a>
+													</c:if>
+													<c:if test="${entry.type=='F'}">${entry.name}</c:if>
+												</div>
+
+												<div id="edit02${sta.index}" class="col-xs-12 col-sm-8" style="display: none">
+													<div class="input-group">
+														<input type="text" id="rename${sta.index}" name="name" class="form-control search-query"> 
+														<span class="input-group-btn">
+															<button class="btn btn-purple btn-sm" onclick="renameBut(${sta.index},'${entry.name}','${entry.type}')" type="button" title="提交">
+																<i class="icon-ok bigger-110"></i>
+															</button>
+															<button class="btn btn-purple btn-sm" onclick="removeBut(${sta.index})" type="button" title="取消">
+																<i class="icon-remove bigger-110"></i>
+															</button>
+														</span>
+													</div>
+												</div> 
 											</td>
+											<td><c:if test="${entry.type=='D'}">文件夹</c:if> <c:if test="${entry.type=='F'}">${entry.size}</c:if></td>
 											<td>${entry.date}</td>
+											<td>
+												<button class="btn btn-xs btn-info" onclick="editName(${sta.index})" title="重命名">
+													<i class="icon-edit bigger-120"></i>
+												</button>
+												<button class="btn btn-xs btn-info" onclick="viewName(${sta.index},'${entry.name}')" title="浏览">
+													<i class="icon-eye-open bigger-120"></i>
+												</button>
+											</td>
 										</tr>
 									</c:forEach>
 								</tbody>
@@ -413,8 +604,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<!-- /.main-content -->
 
 			<div class="ace-settings-container" id="ace-settings-container">
-				<div class="btn btn-app btn-xs btn-warning ace-settings-btn"
-					id="ace-settings-btn">
+				<div class="btn btn-app btn-xs btn-warning ace-settings-btn" id="ace-settings-btn">
 					<i class="icon-cog bigger-150"></i>
 				</div>
 
@@ -432,33 +622,23 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					</div>
 
 					<div>
-						<input type="checkbox" class="ace ace-checkbox-2"
-							id="ace-settings-navbar" /> <label class="lbl"
-							for="ace-settings-navbar"> 固定导航条</label>
+						<input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-navbar" /> <label class="lbl" for="ace-settings-navbar"> 固定导航条</label>
 					</div>
 
 					<div>
-						<input type="checkbox" class="ace ace-checkbox-2"
-							id="ace-settings-sidebar" /> <label class="lbl"
-							for="ace-settings-sidebar"> 固定滑动条</label>
+						<input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-sidebar" /> <label class="lbl" for="ace-settings-sidebar"> 固定滑动条</label>
 					</div>
 
 					<div>
-						<input type="checkbox" class="ace ace-checkbox-2"
-							id="ace-settings-breadcrumbs" /> <label class="lbl"
-							for="ace-settings-breadcrumbs">固定面包屑</label>
+						<input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-breadcrumbs" /> <label class="lbl" for="ace-settings-breadcrumbs">固定面包屑</label>
 					</div>
 
 					<div>
-						<input type="checkbox" class="ace ace-checkbox-2"
-							id="ace-settings-rtl" /> <label class="lbl"
-							for="ace-settings-rtl">切换到左边</label>
+						<input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-rtl" /> <label class="lbl" for="ace-settings-rtl">切换到左边</label>
 					</div>
 
 					<div>
-						<input type="checkbox" class="ace ace-checkbox-2"
-							id="ace-settings-add-container" /> <label class="lbl"
-							for="ace-settings-add-container"> 切换窄屏 <b></b>
+						<input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-add-container" /> <label class="lbl" for="ace-settings-add-container"> 切换窄屏 <b></b>
 						</label>
 					</div>
 				</div>
@@ -467,261 +647,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		</div>
 		<!-- /.main-container-inner -->
 
-		<a href="#" id="btn-scroll-up"
-			class="btn-scroll-up btn btn-sm btn-inverse"> <i
-			class="icon-double-angle-up icon-only bigger-110"></i>
+		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse"> <i class="icon-double-angle-up icon-only bigger-110"></i>
 		</a>
 	</div>
 	<!-- /.main-container -->
 
-	<!-- basic scripts -->
-
-	<!--[if !IE]> -->
-
-	<script src="assets/js/jquery-2.0.3.min.js"></script>
-
-	<!-- <![endif]-->
-
-	<!--[if IE]>
-<script src="assets/js/jquery-1.10.2.min.js"></script>
-<![endif]-->
-
-	<!--[if !IE]> -->
-
-	<script type="text/javascript">
-			window.jQuery || document.write("<script src='assets/js/jquery-2.0.3.min.js'>"+"<"+"script>");
-		</script>
-
-	<!-- <![endif]-->
-
-	<!--[if IE]>
-<script type="text/javascript">
- window.jQuery || document.write("<script src='assets/js/jquery-1.10.2.min.js'>"+"<"+"script>");
-</script>
-<![endif]-->
-
-	<script type="text/javascript">
-			if("ontouchend" in document) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"script>");
-		</script>
-	<script src="assets/js/bootstrap.min.js"></script>
-	<script src="assets/js/typeahead-bs2.min.js"></script>
-
-	<!-- page specific plugin scripts -->
-
-	<!--[if lte IE 8]>
-		  <script src="assets/js/excanvas.min.js"></script>
-		<![endif]-->
-
-	<script src="assets/js/jquery-ui-1.10.3.custom.min.js"></script>
-	<script src="assets/js/jquery.ui.touch-punch.min.js"></script>
-	<script src="assets/js/jquery.slimscroll.min.js"></script>
-	<script src="assets/js/jquery.easy-pie-chart.min.js"></script>
-	<script src="assets/js/jquery.sparkline.min.js"></script>
-	<script src="assets/js/flot/jquery.flot.min.js"></script>
-	<script src="assets/js/flot/jquery.flot.pie.min.js"></script>
-	<script src="assets/js/flot/jquery.flot.resize.min.js"></script>
-
-	<!-- ace scripts -->
-
-	<script src="assets/js/ace-elements.min.js"></script>
-	<script src="assets/js/ace.min.js"></script>
-
-	<!-- inline scripts related to this page -->
-
-	<script type="text/javascript">
-			jQuery(function($) {
-				$('.easy-pie-chart.percentage').each(function(){
-					var $box = $(this).closest('.infobox');
-					var barColor = $(this).data('color') || (!$box.hasClass('infobox-dark') ? $box.css('color') : 'rgba(255,255,255,0.95)');
-					var trackColor = barColor == 'rgba(255,255,255,0.95)' ? 'rgba(255,255,255,0.25)' : '#E2E2E2';
-					var size = parseInt($(this).data('size')) || 50;
-					$(this).easyPieChart({
-						barColor: barColor,
-						trackColor: trackColor,
-						scaleColor: false,
-						lineCap: 'butt',
-						lineWidth: parseInt(size/10),
-						animate: /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase()) ? false : 1000,
-						size: size
-					});
-				})
-			
-				$('.sparkline').each(function(){
-					var $box = $(this).closest('.infobox');
-					var barColor = !$box.hasClass('infobox-dark') ? $box.css('color') : '#FFF';
-					$(this).sparkline('html', {tagValuesAttribute:'data-values', type: 'bar', barColor: barColor , chartRangeMin:$(this).data('min') || 0} );
-				});
-			
-			
-			
-			
-			  var placeholder = $('#piechart-placeholder').css({'width':'90%' , 'min-height':'150px'});
-			  var data = [
-				{ label: "social networks",  data: 38.7, color: "#68BC31"},
-				{ label: "search engines",  data: 24.5, color: "#2091CF"},
-				{ label: "ad campaigns",  data: 8.2, color: "#AF4E96"},
-				{ label: "direct traffic",  data: 18.6, color: "#DA5430"},
-				{ label: "other",  data: 10, color: "#FEE074"}
-			  ]
-			  function drawPieChart(placeholder, data, position) {
-			 	  $.plot(placeholder, data, {
-					series: {
-						pie: {
-							show: true,
-							tilt:0.8,
-							highlight: {
-								opacity: 0.25
-							},
-							stroke: {
-								color: '#fff',
-								width: 2
-							},
-							startAngle: 2
-						}
-					},
-					legend: {
-						show: true,
-						position: position || "ne", 
-						labelBoxBorderColor: null,
-						margin:[-30,15]
-					}
-					,
-					grid: {
-						hoverable: true,
-						clickable: true
-					}
-				 })
-			 }
-			 drawPieChart(placeholder, data);
-			
-			 /**
-			 we saved the drawing function and the data to redraw with different position later when switching to RTL mode dynamically
-			 so that's not needed actually.
-			 */
-			 placeholder.data('chart', data);
-			 placeholder.data('draw', drawPieChart);
-			
-			
-			
-			  var $tooltip = $("<div class='tooltip top in'><div class='tooltip-inner'></div></div>").hide().appendTo('body');
-			  var previousPoint = null;
-			
-			  placeholder.on('plothover', function (event, pos, item) {
-				if(item) {
-					if (previousPoint != item.seriesIndex) {
-						previousPoint = item.seriesIndex;
-						var tip = item.series['label'] + " : " + item.series['percent']+'%';
-						$tooltip.show().children(0).text(tip);
-					}
-					$tooltip.css({top:pos.pageY + 10, left:pos.pageX + 10});
-				} else {
-					$tooltip.hide();
-					previousPoint = null;
-				}
-				
-			 });
-			
-			
-			
-			
-			
-			
-				var d1 = [];
-				for (var i = 0; i < Math.PI * 2; i += 0.5) {
-					d1.push([i, Math.sin(i)]);
-				}
-			
-				var d2 = [];
-				for (var i = 0; i < Math.PI * 2; i += 0.5) {
-					d2.push([i, Math.cos(i)]);
-				}
-			
-				var d3 = [];
-				for (var i = 0; i < Math.PI * 2; i += 0.2) {
-					d3.push([i, Math.tan(i)]);
-				}
-				
-			
-				var sales_charts = $('#sales-charts').css({'width':'100%' , 'height':'220px'});
-				$.plot("#sales-charts", [
-					{ label: "Domains", data: d1 },
-					{ label: "Hosting", data: d2 },
-					{ label: "Services", data: d3 }
-				], {
-					hoverable: true,
-					shadowSize: 0,
-					series: {
-						lines: { show: true },
-						points: { show: true }
-					},
-					xaxis: {
-						tickLength: 0
-					},
-					yaxis: {
-						ticks: 10,
-						min: -2,
-						max: 2,
-						tickDecimals: 3
-					},
-					grid: {
-						backgroundColor: { colors: [ "#fff", "#fff" ] },
-						borderWidth: 1,
-						borderColor:'#555'
-					}
-				});
-			
-			
-				$('#recent-box [data-rel="tooltip"]').tooltip({placement: tooltip_placement});
-				function tooltip_placement(context, source) {
-					var $source = $(source);
-					var $parent = $source.closest('.tab-content')
-					var off1 = $parent.offset();
-					var w1 = $parent.width();
-			
-					var off2 = $source.offset();
-					var w2 = $source.width();
-			
-					if( parseInt(off2.left) < parseInt(off1.left) + parseInt(w1 / 2) ) return 'right';
-					return 'left';
-				}
-			
-			
-				$('.dialogs,.comments').slimScroll({
-					height: '300px'
-			    });
-				
-				
-				//Android's default browser somehow is confused when tapping on label which will lead to dragging the task
-				//so disable dragging when clicking on label
-				var agent = navigator.userAgent.toLowerCase();
-				if("ontouchstart" in document && /applewebkit/.test(agent) && /android/.test(agent))
-				  $('#tasks').on('touchstart', function(e){
-					var li = $(e.target).closest('#tasks li');
-					if(li.length == 0)return;
-					var label = li.find('label.inline').get(0);
-					if(label == e.target || $.contains(label, e.target)) e.stopImmediatePropagation() ;
-				});
-			
-				$('#tasks').sortable({
-					opacity:0.8,
-					revert:true,
-					forceHelperSize:true,
-					placeholder: 'draggable-placeholder',
-					forcePlaceholderSize:true,
-					tolerance:'pointer',
-					stop: function( event, ui ) {//just for Chrome!!!! so that dropdowns on items don't appear below other items after being moved
-						$(ui.item).css('z-index', 'auto');
-					}
-					}
-				);
-				$('#tasks').disableSelection();
-				$('#tasks input:checkbox').removeAttr('checked').on('click', function(){
-					if(this.checked) $(this).closest('li').addClass('selected');
-					else $(this).closest('li').removeClass('selected');
-				});
-				
-			
-			})
-		</script>
 </body>
 </html>

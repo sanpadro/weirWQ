@@ -3,6 +3,7 @@ package com.weirq.db;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,14 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.util.Progressable;
 
+import com.weirq.util.BaseUtils;
 import com.weirq.util.DateUtil;
 import com.weirq.util.SiteUrl;
+import com.weirq.vo.FileSystemVo;
 import com.weirq.vo.HdfsVo;
 import com.weirq.vo.Menu;
 
@@ -64,6 +68,16 @@ public class HdfsDB {
 		});
 		IOUtils.copyBytes(in, out, 4096, true);
 	}
+	
+	public void downLoad(String path,String local) throws Exception {
+		FSDataInputStream in = fs.open(new Path(path));
+		OutputStream out = new FileOutputStream(local);
+		IOUtils.copyBytes(in, out, 4096, true);
+	}
+	
+	public void rename(String src,String dst) throws Exception {
+		fs.rename(new Path(src), new Path(dst));
+	}
 
 	public void mkdir(String dir) throws Exception {
 		if (!fs.exists(new Path(dir))) {
@@ -75,25 +89,27 @@ public class HdfsDB {
 		fs.delete(new Path(name), true);
 	}
 
-	public List<HdfsVo> queryAll(String dir) throws Exception {
-		FileStatus[] files = fs.listStatus(new Path(ROOT + dir));
-		List<HdfsVo> hdfsVos = new ArrayList<HdfsVo>();
-		HdfsVo hdfsVo = null;
+	public List<FileSystemVo> queryAll(String dir) throws Exception {
+		FileStatus[] files = fs.listStatus(new Path(dir));
+		List<FileSystemVo> fileVos = new ArrayList<FileSystemVo>();
+		FileSystemVo f = null;
 		for (int i = 0; i < files.length; i++) {
-			hdfsVo = new HdfsVo();
-			hdfsVo.setId(dir);
+			f = new FileSystemVo();
 			if (files[i].isDirectory()) {
-				hdfsVo.setName(files[i].getPath().getName());
-				hdfsVo.setType("D");
-				hdfsVo.setCreateDate(DateUtil.longToString("yyyy-MM-dd hh:mm:ss", files[i].getModificationTime()));
+				f.setName(files[i].getPath().getName());
+				f.setType("D");
+				f.setDate(DateUtil.longToString("yyyy-MM-dd HH:mm", files[i].getModificationTime()));
+				f.setNamep(files[i].getPath().getName());
 			} else if (files[i].isFile()) {
-				hdfsVo.setName(files[i].getPath().getName());
-				hdfsVo.setType("F");
-				hdfsVo.setCreateDate(DateUtil.longToString("yyyy-MM-dd hh:mm:ss", files[i].getModificationTime()));
+				f.setName(files[i].getPath().getName());
+				f.setType("F");
+				f.setDate(DateUtil.longToString("yyyy-MM-dd HH:mm", files[i].getModificationTime()));
+				f.setSize(BaseUtils.FormetFileSize(files[i].getLen()));
+				f.setNamep(f.getName().substring(0, f.getName().lastIndexOf(".")));
 			}
-			hdfsVos.add(hdfsVo);
+			fileVos.add(f);
 		}
-		return hdfsVos;
+		return fileVos;
 	}
 	static List<Menu> menus = new ArrayList<Menu>();
 	public static void visitPath(String path) throws IOException {

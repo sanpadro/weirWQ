@@ -38,3 +38,58 @@ $(function(){
 		},
 		onUploadProgress : function(file, bytesUploaded, bytesTotal, totalBytesUploaded, totalBytesTotal) { }});});function upload() {	$('#null').uploadify('upload', '*');		return flag;}function cancel() {$('#null').uploadify('cancel', '*');}</script>
 }
+
+
+
+function getUser() {
+	var name = $.trim($("#username").val());
+	if (name == null || name == '') {
+		alert("请输入你要找的用户名");
+		return false;
+	}
+	var data = $("#searchUser").formToArray();
+	$.ajax({
+				type : "POST",
+				url : "user/getuser.do",
+				data : data,
+				dataType : "json",
+				success : function(json) {
+					if (json.success) {
+						var str = "";
+						str += '<div class="col-lg-1 col-md-1">';
+						str += '<div class="thumbnail"><img src="assets/avatars/profile-pic.jpg"></div>';
+						str += '<div class="caption itemdiv commentdiv"><h4>'
+								+ json.msg + '</h4>';
+						str += '<div class="tools">';
+						str += '<div class="action-buttons bigger-125">';
+						str += '<button type="button" onclick="followUser(\''
+								+ json.msg
+								+ '\')" class="btn btn-success btn-xs">';
+						str += '<span class="glyphicon glyphicon-ok"></span> 立刻关注</button>';
+						str += '</div></div>';
+						str += '</div></div>';
+						$("#showsearch").append(str);
+						// location.reload();
+					} else {
+						alert(json.msg);
+					}
+
+				}
+			});
+}
+function followUser(name) {
+	$.post('${pageContext.request.contextPath}/user/follow.do', {
+		username : name
+	}, function(j) {
+		if (j.success) {
+			location.reload();
+		} else {
+			alert(json.msg);
+		}
+	}, 'json');
+}
+$(document).ready(function() {
+	$("#follow").mouseenter(function() {
+		$("#unfollow").show();
+	});
+});
