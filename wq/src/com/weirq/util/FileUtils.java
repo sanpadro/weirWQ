@@ -6,8 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-
-
 public class FileUtils {
 	
 	public static String getFilePrefix(String fileName){
@@ -40,5 +38,9 @@ public class FileUtils {
 				e.printStackTrace();
 			}
         } 
+	}
+	public static void main(String[] args) {
+		String s ="dsdsdsd.rar";
+		System.out.println(getFileSufix(s));
 	}
 }

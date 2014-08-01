@@ -4,7 +4,6 @@
 <head>
 <title>创建文件夹</title>
 <meta name="content-type" content="text/html; charset=UTF-8">
-<jsp:include page="/pub.jsp"></jsp:include>
 <script type="text/javascript">
 var mkdir_submitForm = function(dialog, cloudDataGrid, p) {
 	if ($('mkdir_addForm').form('validate')) {

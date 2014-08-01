@@ -38,6 +38,7 @@ import com.weirq.util.SiteUrl;
 import com.weirq.vo.FileSystemVo;
 import com.weirq.vo.Menu;
 import com.weirq.vo.ShareVo;
+import com.weirq.vo.bookVo;
 
 
 public class HbaseDB  implements Serializable{
@@ -634,7 +635,7 @@ public class HbaseDB  implements Serializable{
 	 * @return
 	 * @throws Exception
 	 */
-	public List<ShareVo> getshareed(String username) throws Exception {
+	public List<FileSystemVo> getshareed(String username) throws Exception {
 		long uid = getIdByUsername(username);
 		Scan scan = new Scan();
 		scan.setStartRow(Bytes.toBytes(uid));
@@ -642,25 +643,60 @@ public class HbaseDB  implements Serializable{
 		HTable shareed_table = new HTable(TableName.valueOf("shareed"), connection);
 		ResultScanner rs = shareed_table.getScanner(scan);
 		HTable share_table = new HTable(TableName.valueOf("share"), connection);
-		List<ShareVo> shareVos = new ArrayList<ShareVo>();
-		ShareVo share = null;
+		List<FileSystemVo> fs = new ArrayList<FileSystemVo>();
+		FileSystemVo f = null;
 		for (Result r : rs) {
 			Result shareRs = share_table.get(new Get(r.getValue(Bytes.toBytes("shareid"), null)));
 			Cell cellPath = shareRs.getColumnLatestCell(Bytes.toBytes("content"), Bytes.toBytes("path"));
 			Cell cellTs = shareRs.getColumnLatestCell(Bytes.toBytes("content"), Bytes.toBytes("ts"));
 			Cell cellType = shareRs.getColumnLatestCell(Bytes.toBytes("content"), Bytes.toBytes("type"));
 			Cell cellDir = shareRs.getColumnLatestCell(Bytes.toBytes("content"), Bytes.toBytes("dir"));
-			share = new ShareVo();
-			share.setShareid(Bytes.toString(shareRs.getRow()));
-			share.setPath(Bytes.toString(CellUtil.cloneValue(cellPath)));
-			share.setTs(Bytes.toString(CellUtil.cloneValue(cellTs)));
-			share.setType(Bytes.toString(CellUtil.cloneValue(cellType)));
-			share.setDir(Bytes.toString(CellUtil.cloneValue(cellDir)));
-			shareVos.add(share);
+			f = new FileSystemVo();
+//			f.setShareid(Bytes.toString(shareRs.getRow()));
+			f.setName(Bytes.toString(CellUtil.cloneValue(cellPath)));
+			f.setDate(Bytes.toString(CellUtil.cloneValue(cellTs)));
+			f.setType(Bytes.toString(CellUtil.cloneValue(cellType)));
+			f.setDir(Bytes.toString(CellUtil.cloneValue(cellDir)));
+			fs.add(f);
 		}
 		share_table.close();
 		shareed_table.close();
-		return shareVos;
+		return fs;
+	}
+	/**
+	 * 新增记事本
+	 * @param username
+	 * @param content
+	 * @throws Exception
+	 */
+	public void addbook(String username,String content) throws Exception {
+		long uid = getIdByUsername(username);
+		long id = getGid("bookid");
+		add("book", uid, id, "content", null, content);
+	}
+	/**
+	 * 查询记事本
+	 * @param username
+	 * @return
+	 * @throws Exception
+	 */
+	public List<bookVo> listbook(String username) throws Exception {
+		long uid = getIdByUsername(username);
+		Scan scan = new Scan();
+		scan.setStartRow(Bytes.toBytes(uid));
+		scan.setStopRow(Bytes.toBytes(uid+1));
+		HTable table = new HTable(TableName.valueOf("book"), connection);
+		ResultScanner rs = table.getScanner(scan);
+		List<bookVo> books = new ArrayList<bookVo>();
+		bookVo book = null;
+		for (Result r : rs) {
+			book = new bookVo();
+			book.setId(Bytes.toString(r.getRow()));
+			book.setContent(Bytes.toString(r.getValue(Bytes.toBytes("content"), null)));
+			books.add(book);
+		}
+		table.close();
+		return books;
 	}
 	
 	public static void main(String[] args) throws Exception {

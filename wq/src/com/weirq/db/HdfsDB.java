@@ -20,6 +20,7 @@ import org.apache.hadoop.util.Progressable;
 
 import com.weirq.util.BaseUtils;
 import com.weirq.util.DateUtil;
+import com.weirq.util.FileUtils;
 import com.weirq.util.SiteUrl;
 import com.weirq.vo.FileSystemVo;
 import com.weirq.vo.HdfsVo;
@@ -27,6 +28,7 @@ import com.weirq.vo.Menu;
 
 public class HdfsDB {
 
+	private static String[] suf = {"csv","txt","doc","docx","xls","xlsx","ppt","pptx"};
 	private static final String ROOT = "/";
 	static FileSystem fs;
 
@@ -48,6 +50,12 @@ public class HdfsDB {
 		}
 	}
 
+	/**
+	 * 上传文件
+	 * @param filePath
+	 * @param dir
+	 * @throws Exception
+	 */
 	public void upload(String filePath, String dir) throws Exception {
 		InputStream in = new BufferedInputStream(new FileInputStream(filePath));
 		OutputStream out = fs.create(new Path(ROOT + dir), new Progressable() {
@@ -59,6 +67,12 @@ public class HdfsDB {
 		});
 		IOUtils.copyBytes(in, out, 4096, true);
 	}
+	/**
+	 * 已流形式上传
+	 * @param in
+	 * @param dir
+	 * @throws Exception
+	 */
 	public void upload(InputStream in, String dir) throws Exception {
 		OutputStream out = fs.create(new Path(dir), new Progressable() {
 			@Override
@@ -68,27 +82,52 @@ public class HdfsDB {
 		});
 		IOUtils.copyBytes(in, out, 4096, true);
 	}
-	
+	/**
+	 * 下载文件
+	 * @param path
+	 * @param local
+	 * @throws Exception
+	 */
 	public void downLoad(String path,String local) throws Exception {
 		FSDataInputStream in = fs.open(new Path(path));
 		OutputStream out = new FileOutputStream(local);
 		IOUtils.copyBytes(in, out, 4096, true);
 	}
-	
+	/**
+	 * 重命名文件
+	 * @param src
+	 * @param dst
+	 * @throws Exception
+	 */
 	public void rename(String src,String dst) throws Exception {
 		fs.rename(new Path(src), new Path(dst));
 	}
 
+	/**
+	 * 创建文件夹
+	 * @param dir
+	 * @throws Exception
+	 */
 	public void mkdir(String dir) throws Exception {
 		if (!fs.exists(new Path(dir))) {
 			fs.mkdirs(new Path(dir));
 		}
 	}
-	
+	/**
+	 * 删除文件及文件夹
+	 * @param name
+	 * @throws Exception
+	 */
 	public void delete(String name) throws Exception {
 		fs.delete(new Path(name), true);
 	}
 
+	/**
+	 * 查询文件夹
+	 * @param dir
+	 * @return
+	 * @throws Exception
+	 */
 	public List<FileSystemVo> queryAll(String dir) throws Exception {
 		FileStatus[] files = fs.listStatus(new Path(dir));
 		List<FileSystemVo> fileVos = new ArrayList<FileSystemVo>();
@@ -106,30 +145,17 @@ public class HdfsDB {
 				f.setDate(DateUtil.longToString("yyyy-MM-dd HH:mm", files[i].getModificationTime()));
 				f.setSize(BaseUtils.FormetFileSize(files[i].getLen()));
 				f.setNamep(f.getName().substring(0, f.getName().lastIndexOf(".")));
+				String s=FileUtils.getFileSufix(f.getName());
+				for (int j = 0; j < suf.length; j++) {
+					if (s.equals(suf[j])) {
+						f.setViewflag("Y");
+						break;
+					}
+				}
 			}
 			fileVos.add(f);
 		}
 		return fileVos;
-	}
-	static List<Menu> menus = new ArrayList<Menu>();
-	public static void visitPath(String path) throws IOException {
-		Menu menu = null;
-		Path inputDir = new Path(path);
-		FileStatus[] inputFiles = fs.listStatus(inputDir);
-		if (inputFiles.length>0) {
-			for (int i = 0; i < inputFiles.length; i++) {
-				menu = new Menu();
-				if (inputFiles[i].isDirectory()) {
-					menu.setPname(inputFiles[i].getPath().getName());
-					menus.add(menu);
-					visitPath(inputFiles[i].getPath().toString());
-				} else {
-					menu.setName(inputFiles[i].getPath().getName());
-//					menus.add(menu);
-//					System.out.println(inputFiles[i].getPath().getName() + ",len:" + inputFiles[i].getLen());
-				}
-			}
-		}
 	}
 
 	public static void main(String[] args) throws Exception {

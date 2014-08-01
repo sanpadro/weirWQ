@@ -99,4 +99,8 @@ public class OfficeToSwf {
             }
             //System.out.println("关闭office转换成功!");
     }
+    
+    public static void main(String[] args) {
+		convert2PDF("F:\\status.csv");
+	}
 }

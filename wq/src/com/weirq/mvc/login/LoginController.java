@@ -127,6 +127,14 @@ public class LoginController extends BaseController {
 		String[] fam_shareid = {"shareid"};
 		db.createTable(table_shareed, fam_shareid,1);*/
 		
+		/*db.add("gid", "bookid", "gid", "bookid", (long)0);
+		//tableName:book
+		//rowkey:userid+id
+		//content:
+		String table_book = "book";
+		String[] fam_book_content = {"content"};
+		db.createTable(table_book, fam_book_content,1);*/
+		
 		return "redirect:login.jsp";
 	}
 }

@@ -1,8 +1,10 @@
 package com.weirq.mvc.cloud;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -188,6 +190,7 @@ public class CloudController extends BaseController{
 		}
 		return json;
 	}
+	
 	/**
 	 * 查看文档
 	 * @param dir
@@ -204,7 +207,7 @@ public class CloudController extends BaseController{
 		File outFile = new File(swfFile);
 		if(outFile.exists()){
 			model.addAttribute("local", "test/"+name.substring(0,name.lastIndexOf("."))+".swf");
-			return "22";
+			return "cloud/view";
 		}
 		String pdfFile = FileUtils.getFilePrefix(local+"\\"+name)+".pdf";
 		File outFile01 = new File(pdfFile);
@@ -215,7 +218,17 @@ public class CloudController extends BaseController{
 			OfficeToSwf.pdftoswf(pdfFile);
 		}
 		model.addAttribute("local", "test/"+name.substring(0,name.lastIndexOf("."))+".swf");
-		return "22";
+		return "cloud/view";
+	}
+	@RequestMapping("/download")
+	public String download(String dir,String name,HttpServletRequest request,Model model) throws Exception {
+		String local = request.getServletContext().getRealPath("/test");
+		File f = new File(local+"\\"+name);
+		if (!f.exists()) {
+			hdfsDB.downLoad(dir+"/"+name, local+"\\"+name);
+		}
+		model.addAttribute("name", name);
+		return "/cloud/down";
 	}
 	/**
 	 * 分享
@@ -250,6 +263,13 @@ public class CloudController extends BaseController{
 		json.setSuccess(true);
 		return json;
 	}
+	/**
+	 * 获取分享
+	 * @param session
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/getshare")
 	public String getshare(HttpSession session,Model model) throws Exception {
 		String name = (String) session.getAttribute("username");
@@ -259,6 +279,13 @@ public class CloudController extends BaseController{
 		model.addAttribute("shares", db.getshare(name));
 		return "cloud/share";
 	}
+	/**
+	 * 获取被分享
+	 * @param session
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/getshareed")
 	public String getshareed(HttpSession session,Model model) throws Exception {
 		String name = (String) session.getAttribute("username");
@@ -267,5 +294,52 @@ public class CloudController extends BaseController{
 		}
 		model.addAttribute("shares", db.getshareed(name));
 		return "cloud/shareed";
+	}
+	/**
+	 * 查询被分享
+	 * @param dir
+	 * @param path
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/shareedList")
+	public String shareedList(String dir,String path,Model model) throws Exception {
+		if (dir==null) {
+			dir=path;
+		}else{
+			dir=dir+"/"+path;
+		}
+		List<FileSystemVo> list = hdfsDB.queryAll(dir);
+		model.addAttribute("shares", list);
+		model.addAttribute("dir", dir);
+		return "cloud/shareed_list";
+	}
+	@RequestMapping("booklist")
+	public String booklist(HttpSession session,Model model) throws Exception {
+		String name = (String) session.getAttribute("username");
+		if (name==null) {
+			return null;
+		}
+		model.addAttribute("books", db.listbook(name));
+		return "cloud/book";
+	}
+	@ResponseBody
+	@RequestMapping("bookadd")
+	public Json bookadd(String content,HttpSession session) throws Exception {
+		Json json = new Json();
+		String name = (String) session.getAttribute("username");
+		if (name==null) {
+			json.setMsg("用户已注销，请重新登陆");
+			return json;
+		}
+		try {
+			db.addbook(name, content);
+			json.setSuccess(true);
+		} catch (Exception e) {
+			json.setMsg("记事本添加失败");
+			e.printStackTrace();
+		}
+		return json;
 	}
 }

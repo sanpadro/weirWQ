@@ -9,6 +9,7 @@ public class FileSystemVo {
 	private String type;
 	private String date;
 	private String size;
+	private String viewflag="N";
 	
 	private String ids;
 	private String names;
@@ -81,5 +82,11 @@ public class FileSystemVo {
 	}
 	public void setNamep(String namep) {
 		this.namep = namep;
+	}
+	public String getViewflag() {
+		return viewflag;
+	}
+	public void setViewflag(String viewflag) {
+		this.viewflag = viewflag;
 	}
 }
