@@ -1,16 +1,12 @@
 package com.weirq.mvc.cloud;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
@@ -28,6 +24,7 @@ import com.weirq.util.FileUtils;
 import com.weirq.util.Json;
 import com.weirq.util.OfficeToSwf;
 import com.weirq.vo.FileSystemVo;
+import com.weirq.vo.Menu;
 
 @Controller
 @RequestMapping("/cloud")
@@ -147,14 +144,36 @@ public class CloudController extends BaseController{
 	@RequestMapping("/delete")
 	public Json delete(String ids,String dir) throws Exception {
 		Json json = new Json();
-//		String[] ss = fs.getIds().split(",");
 		try {
-			//db.deleteRow("filesystem", ss);
 			String[] ns = ids.split(",");
-//			String[] ds = fs.getDirs().split(",");
 			for (int i = 0; i < ns.length; i++) {
 				hdfsDB.delete(dir+"/"+ns[i]);
 			}
+			json.setSuccess(true);
+			json.setMsg("删除成功");
+		} catch (Exception e) {
+			json.setMsg("删除失败");
+			e.printStackTrace();
+		}
+		return json;
+	}
+	/**
+	 * 复制文件及文件夹
+	 * @param ids
+	 * @param dir
+	 * @return
+	 * @throws Exception
+	 */
+	@ResponseBody
+	@RequestMapping("/copy")
+	public Json copy(String ids,String dir,String dst,boolean flag) throws Exception {
+		Json json = new Json();
+		String[] ns = ids.split(",");
+		for (int i = 0; i < ns.length; i++) {
+			ns[i] = dir+"/"+ns[i];
+		}
+		try {
+			hdfsDB.copy(ns, dst, flag);
 			json.setSuccess(true);
 			json.setMsg("删除成功");
 		} catch (Exception e) {
@@ -228,7 +247,7 @@ public class CloudController extends BaseController{
 			hdfsDB.downLoad(dir+"/"+name, local+"\\"+name);
 		}
 		model.addAttribute("name", name);
-		return "/cloud/down";
+		return "cloud/down";
 	}
 	/**
 	 * 分享
@@ -315,7 +334,14 @@ public class CloudController extends BaseController{
 		model.addAttribute("dir", dir);
 		return "cloud/shareed_list";
 	}
-	@RequestMapping("booklist")
+	/**
+	 * 记事本列表
+	 * @param session
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/booklist")
 	public String booklist(HttpSession session,Model model) throws Exception {
 		String name = (String) session.getAttribute("username");
 		if (name==null) {
@@ -324,8 +350,15 @@ public class CloudController extends BaseController{
 		model.addAttribute("books", db.listbook(name));
 		return "cloud/book";
 	}
+	/**
+	 * 新增记事本
+	 * @param content
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
 	@ResponseBody
-	@RequestMapping("bookadd")
+	@RequestMapping("/bookadd")
 	public Json bookadd(String content,HttpSession session) throws Exception {
 		Json json = new Json();
 		String name = (String) session.getAttribute("username");
@@ -341,5 +374,20 @@ public class CloudController extends BaseController{
 			e.printStackTrace();
 		}
 		return json;
+	}
+	@ResponseBody
+	@RequestMapping("/tree")
+	public List<Menu> tree(String id,HttpSession session) throws Exception {
+		List<Menu> menus = null;
+		if (BaseUtils.isNotEmpty(id)) {
+			menus = hdfsDB.tree(id);
+		}else{
+			String name = (String) session.getAttribute("username");
+			if (name==null) {
+				return null;
+			}
+			menus = hdfsDB.tree("/"+name);
+		}
+		return menus;
 	}
 }

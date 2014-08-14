@@ -1,5 +1,5 @@
 <%@ page language="java" pageEncoding="UTF-8"%>
-<%@ include file="/public/taglib.jsp" %>
+<%@ include file="/public/taglib.jsp"%>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -33,7 +33,7 @@ KindEditor.ready(function(K) {
 </head>
 
 <body>
-<jsp:include page="/public/top.jsp"></jsp:include>
+	<jsp:include page="/public/top.jsp"></jsp:include>
 	<div class="main-container" id="main-container">
 		<script type="text/javascript">
 			try {
@@ -66,35 +66,42 @@ KindEditor.ready(function(K) {
 					<div class="page-header">
 						<form id="searchUser">
 							<input type="text" id="username" name="username" placeholder="输入用户名" /> <input class="button purple" type="button" onclick="getUser()" value="搜索" />
-							
-							<textarea id="editor_id" name="content" style="width:700px;height:200px;visibility:hidden;" ></textarea>
+
+							<textarea id="editor_id" name="content" style="width:700px;height:200px;visibility:hidden;"></textarea>
 						</form>
-						
+
 					</div>
 					<!-- /.page-header -->
 					<div class="row" id="showsearch"></div>
-					<div class="row">
-						<c:forEach items="${books}" var="entry">
-							<div class="col-lg-1 col-md-1">
-								<div class="thumbnail">
-									${entry.content}
-								</div>
-								<div class="caption itemdiv commentdiv">
-									<h4>ww</h4>
-									<div class="tools">
-										<div class="action-buttons bigger-125">
-											<!-- <a href="#"> <i class="icon-pencil blue"></i>
-											</a> <a href="#"> <i class="icon-trash red"></i>
-											</a> -->
-											<button type="button" onclick="unfollowUser()" class="btn btn-grep btn-xs">
-											<span class="glyphicon glyphicon-remove"></span> 取消关注
-										</button>
+
+					<c:forEach items="${books}" var="entry">
+						<div class="row">
+							<div class="col-sm-12 widget-container-span">
+								<div class="widget-box">
+									<div class="widget-header widget-hea1der-small header-color-dark">
+										<h6>记事本</h6>
+
+										<div class="widget-toolbar">
+											<a href="#" data-action="settings"> <i class="icon-cog"></i>
+											</a> <a href="#" data-action="reload"> <i class="icon-refresh"></i>
+											</a> <a href="#" data-action="collapse"> <i class="icon-chevron-up"></i>
+											</a> <a href="#"> <i class="icon-remove"></i>
+											</a>
+										</div>
+									</div>
+
+									<div class="widget-body">
+										<div class="widget-main padding-4">
+											<div class="slim-scroll" data-height="125">
+												<div class="content">${entry.content}</div>
+											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-						</c:forEach>
-					</div>
+						</div>
+					</c:forEach>
+
 
 				</div>
 				<!-- /.page-content -->
@@ -167,7 +174,18 @@ KindEditor.ready(function(K) {
 				if(this.checked) $(this).closest('li').addClass('selected');
 				else $(this).closest('li').removeClass('selected');
 			});
-		})
+			
+			$('.widget-container-span').sortable({
+		        connectWith: '.widget-container-span',
+				items:'> .widget-box',
+				opacity:0.8,
+				revert:true,
+				forceHelperSize:true,
+				placeholder: 'widget-placeholder',
+				forcePlaceholderSize:true,
+				tolerance:'pointer'
+		    });
+		});
 	</script>
 </body>
 </html>

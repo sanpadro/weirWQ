@@ -10,12 +10,18 @@ public class Menu {
 	private String iconcls;
 	private String url;
 	
-	private String state;
+	private String state = "closed";
 	private String pid;
 	private String pname;
 	private Map<String, Object> attributes;
 	private String createtime;
+	public Menu(){}
 
+	public Menu(String id, String text) {
+		super();
+		this.id = id;
+		this.text = text;
+	}
 	public Map<String, Object> getAttributes() {
 		return attributes;
 	}

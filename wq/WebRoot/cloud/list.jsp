@@ -38,9 +38,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						<input type="button" class="button blue" value="创建文件夹" onclick="mkdir()" />
 						<input type="button" class="button darkblue" value="删除" onclick="deldir()" />
 						<input type="button" class="button teal" value="分享" onclick="share()" />
-
-						<!-- <li><i class="icon-home home-icon"></i> <a href="#">首页</a></li>
-						<li class="active">我的网盘</li> -->
+						<input type="button" class="button teal" value="复制" onclick="copyOrMove(false)" />
+						<input type="button" class="button teal" value="移动" onclick="copyOrMove(true)" />
 					</ul>
 					<!-- .breadcrumb -->
 
@@ -106,36 +105,17 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 									}
 							   });
 							   if(ids.length>0){
-								   $( "#dialog-confirm" ).removeClass('hide').dialog({
-										resizable: false,
-										modal: true,
-										title: "删除提醒",
-										title_html: true,
-										buttons: [
-											{
-												text: "取消",
-												"class" : "btn btn-xs",
-												click: function() {
-													$( this ).dialog( "close" );
-												}
-											},
-											{
-												text: "确定",
-												"class" : "btn btn-primary btn-xs",
-												click: function() {
-													$.post('${pageContext.request.contextPath}/cloud/delete.do', {ids:ids.join(','),dir:dir}, function(j) {
-														if (j.success) {
-															location.reload();
-														}else{
-															alert(json.msg);
-														}
-													}, 'json');
-												}
+								   layer.confirm('删除提醒',function(index){
+									   $.post('${pageContext.request.contextPath}/cloud/delete.do', {ids:ids.join(','),dir:dir}, function(j) {
+											if (j.success) {
+												location.reload();
+											}else{
+												alert(json.msg);
 											}
-										]
+										}, 'json');
 									});
 							   }else{
-								   alert("你没有选择");
+								   layer.msg('你没有选择', 2, -1);
 							   }
 						   }
 						   $(document).ready(function(){
@@ -232,6 +212,27 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								   alert("你没有选择");
 							   }
 						   }
+						   function copyOrMove(flag){
+							   var dir = $("#dir").val();
+							   var ids = [];
+							   $("#listdir input[type=checkbox]").each(function(){
+								   if(this.checked==true){
+									   ids.push(this.value);
+									}
+							   });
+							   if(ids.length>0){
+								   $.layer({
+									    type: 2,
+									    border: [0],
+									    title: '复制到',
+									    closeBtn: [0, true],
+									    iframe: {src : 'cloud/tree.jsp?dir='+dir+'&ids='+ids+'&flag='+flag},
+									    area: ['200px', '300px']
+									});
+							   }else{
+								   alert("你没有选择");
+							   }
+						   }
 						</script>
 					<div class="page-header">
 						<h1>${url}</h1>
@@ -242,7 +243,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						<div class="col-xs-12">
 
 							<div id="dialog-confirm" class="hide">
-
 								<p class="bigger-110 bolder center grey">
 									<i class="icon-hand-right blue bigger-120"></i> 你确定要删除么？
 								</p>
@@ -275,9 +275,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 													<c:if test="${entry.type=='F'}">${entry.name}</c:if>
 												</div>
 
-												<div id="edit02${sta.index}" class="col-xs-12 col-sm-8" style="display: none">
+												<div id="edit02${sta.index}" class="col-xs-6 col-sm-4" style="display: none">
 													<div class="input-group">
-														<input type="text" id="rename${sta.index}" name="name" class="form-control search-query"> 
+														<input type="text" id="rename${sta.index}" name="name" class="form-control"> 
 														<span class="input-group-btn">
 															<button class="btn btn-purple btn-sm" onclick="renameBut(${sta.index},'${entry.name}','${entry.type}')" type="button" title="提交">
 																<i class="icon-ok bigger-110"></i>

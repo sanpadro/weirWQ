@@ -1,19 +1,4 @@
 <%@ page language="java" pageEncoding="UTF-8"%>
-<%
-String path = request.getContextPath();
-String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
-%>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<base href="<%=basePath%>">
-
-<title>top</title>
-
-</head>
-
-<body>
 	<div class="ace-settings-container" id="ace-settings-container">
 		<div class="btn btn-app btn-xs btn-warning ace-settings-btn" id="ace-settings-btn">
 			<i class="icon-cog bigger-150"></i>
@@ -54,6 +39,3 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</div>
 		</div>
 	</div>
-	<!-- /#ace-settings-container -->
-</body>
-</html>

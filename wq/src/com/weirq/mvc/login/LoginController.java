@@ -77,63 +77,40 @@ public class LoginController extends BaseController {
 		
 		hdfsDB.mkdir("/admin");*/
 		
-//		String table_emun = "emun";
-//		String[] fam_emun = {"emun"};
-//		db.createTable(table_emun, fam_emun,1);
-//		
-//		long id1 = db.getGid();
-//		db.add(table_emun, id1, "emun", "name", "菜单管理");
-//		db.add(table_emun, id1, "emun", "url", "/emun/list.do");
-//		long id02 = db.getGid();
-//		db.add(table_emun, id02, "emun", "name", "云盘");
-//		db.add(table_emun, id02, "emun", "url", "/cloud/list.do");
-		
-//		String table_files = "filesystem";
-//		String[] fam_file = {"files"};
-//		db.createTable(table_files, fam_file,1);
-//		
-//		long id03 = db.getGid();
-//		db.add(table_files, id03, "files", "name", "admin");
-//		db.add(table_files, id03, "files", "dir", "/");
-//		db.add(table_files, id03, "files", "pdir", "");
-//		db.add(table_files, id03, "files", "type", "D");*/
-//		hdfsDB.mkdir("/admin");
-		
-		
-		/*String table_follow = "follow";
+		String table_follow = "follow";
 		String[] fam_follow_name = {"name"};
 		db.createTable(table_follow, fam_follow_name,1);
 		
 		String table_followed = "followed";
 		String[] fam_followed_userid = {"userid"};
-		db.createTable(table_followed, fam_followed_userid,1);*/
+		db.createTable(table_followed, fam_followed_userid,1);
 		
-		//db.add("gid", "shareid", "gid", "shareid", (long)0);
+		db.add("gid", "shareid", "gid", "shareid", (long)0);
 		/*
 		 * tableName:share
 		 * rowkey:userid+shareid
 		 * content:path,content:ts
-		 * 
+		 */ 
 		String table_share = "share";
 		String[] fam_centent = {"content"};
 		db.createTable(table_share, fam_centent,1);
 		
-		
+		/*
 		 * tableName:shareed
 		 * rowkey:userid+userid+shareid
 		 * shareid:
-		 * 
+		 */ 
 		String table_shareed = "shareed";
 		String[] fam_shareid = {"shareid"};
-		db.createTable(table_shareed, fam_shareid,1);*/
+		db.createTable(table_shareed, fam_shareid,1);
 		
-		/*db.add("gid", "bookid", "gid", "bookid", (long)0);
+		db.add("gid", "bookid", "gid", "bookid", (long)0);
 		//tableName:book
 		//rowkey:userid+id
 		//content:
 		String table_book = "book";
 		String[] fam_book_content = {"content"};
-		db.createTable(table_book, fam_book_content,1);*/
+		db.createTable(table_book, fam_book_content,1);
 		
 		return "redirect:login.jsp";
 	}

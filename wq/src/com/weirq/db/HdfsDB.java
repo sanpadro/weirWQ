@@ -2,7 +2,6 @@ package com.weirq.db;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +13,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.util.Progressable;
@@ -23,7 +23,6 @@ import com.weirq.util.DateUtil;
 import com.weirq.util.FileUtils;
 import com.weirq.util.SiteUrl;
 import com.weirq.vo.FileSystemVo;
-import com.weirq.vo.HdfsVo;
 import com.weirq.vo.Menu;
 
 public class HdfsDB {
@@ -31,6 +30,7 @@ public class HdfsDB {
 	private static String[] suf = {"csv","txt","doc","docx","xls","xlsx","ppt","pptx"};
 	private static final String ROOT = "/";
 	static FileSystem fs;
+	static Configuration conf;
 
 	private static class HdfsDBInstance {
 		private static final HdfsDB instance = new HdfsDB();
@@ -41,7 +41,7 @@ public class HdfsDB {
 	}
 
 	private HdfsDB() {
-		Configuration conf = new Configuration();
+		conf = new Configuration();
 		conf.set("fs.defaultFS", SiteUrl.readUrl("hdfs"));
 		try {
 			fs = FileSystem.get(conf);
@@ -157,6 +157,31 @@ public class HdfsDB {
 		}
 		return fileVos;
 	}
+	/**
+	 * 移动或复制文件
+	 * @param path
+	 * @param dst
+	 * @param src true 移动文件;false 复制文件
+	 * @throws Exception
+	 */
+	public void copy(String[] path, String dst,boolean src) throws Exception {
+		Path[] paths = new Path[path.length];
+		for (int i = 0; i < path.length; i++) {
+			paths[i]=new Path(path[i]);
+		}
+		FileUtil.copy(fs, paths, fs, new Path(dst), src, true, conf);
+	}
+	
+	public List<Menu> tree(String dir) throws Exception {
+		FileStatus[] files = fs.listStatus(new Path(dir));
+		List<Menu> menus = new ArrayList<Menu>();
+		for (int i = 0; i < files.length; i++) {
+			if (files[i].isDirectory()) {
+				menus.add(new Menu(files[i].getPath().toString(), files[i].getPath().getName()));
+			}
+		}
+		return menus;
+	}
 
 	public static void main(String[] args) throws Exception {
 		HdfsDB hdfsDB = new HdfsDB();
@@ -171,7 +196,8 @@ public class HdfsDB {
 //			System.out.println(menu.getPname());
 //		}
 //		hdfsDB.delete("weirqq");
-		hdfsDB.mkdir("/weirqq");
+//		hdfsDB.mkdir("/weirqq");
+		hdfsDB.tree("/admin");
 		System.out.println("ok");
 	}
 }
