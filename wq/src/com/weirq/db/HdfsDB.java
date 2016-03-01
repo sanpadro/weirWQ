@@ -185,7 +185,7 @@ public class HdfsDB {
 
 	public static void main(String[] args) throws Exception {
 		HdfsDB hdfsDB = new HdfsDB();
-//		hdfsDB.mkdir(ROOT+"weir/qq");
+		hdfsDB.mkdir(ROOT+"weir/qq");
 
 		// String path = "C://Users//Administrator//Desktop//jeeshop-jeeshop-master.zip";
 		// hdfsDB.upload(path, "weir/"+"jeeshop.zip");
@@ -197,7 +197,7 @@ public class HdfsDB {
 //		}
 //		hdfsDB.delete("weirqq");
 //		hdfsDB.mkdir("/weirqq");
-		hdfsDB.tree("/admin");
+//		hdfsDB.tree("/admin");
 		System.out.println("ok");
 	}
 }
