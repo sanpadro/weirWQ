@@ -15,16 +15,16 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.client.HConnection;
-import org.apache.hadoop.hbase.client.HConnectionManager;
-import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
 import org.apache.hadoop.hbase.filter.Filter;
@@ -42,7 +42,8 @@ import com.weirq.vo.bookVo;
 
 public class HbaseDB  implements Serializable{
 	private static final long serialVersionUID = -7137236230164276653L;
-	static HConnection connection;
+//	static HConnection connection;
+	static Connection connection;
 	
 	private static class HbaseDBInstance{
 		private static final HbaseDB instance = new HbaseDB();
@@ -54,7 +55,8 @@ public class HbaseDB  implements Serializable{
 		Configuration conf = HBaseConfiguration.create();
 		conf.set("hbase.zookeeper.quorum", SiteUrl.readUrl("host"));
 		try {
-			connection = HConnectionManager.createConnection(conf);
+//			connection = HConnectionManager.createConnection(conf);
+			connection = ConnectionFactory.createConnection(conf);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -69,7 +71,9 @@ public class HbaseDB  implements Serializable{
 	 * @throws Exception
 	 */
 	public static TableName[] listTable() throws Exception {
-		HBaseAdmin admin = new HBaseAdmin(connection);
+		
+//		HBaseAdmin admin = new HBaseAdmin(connection);
+		Admin admin = connection.getAdmin();
 		TableName[] tableNames = admin.listTableNames();
 		admin.close();
 		return tableNames;
@@ -78,11 +82,14 @@ public class HbaseDB  implements Serializable{
 	 * 删除所有表
 	 */
 	public static void deleteAllTable() throws Exception{
-		HBaseAdmin admin = new HBaseAdmin(connection);
+//		HBaseAdmin admin = new HBaseAdmin(connection);
+		Admin admin = connection.getAdmin();
 		TableName[] tableNames = admin.listTableNames();
 		for (int i = 0; i < tableNames.length; i++) {
-			admin.disableTable(tableNames[i].getNameAsString());
-			admin.deleteTable(tableNames[i].getNameAsString());
+//			admin.disableTable(tableNames[i].getNameAsString());
+//			admin.deleteTable(tableNames[i].getNameAsString());
+			admin.disableTable(tableNames[i]);
+			admin.deleteTable(tableNames[i]);
 		}
 		admin.close();
 	}
@@ -93,15 +100,21 @@ public class HbaseDB  implements Serializable{
 	 * @throws Exception
 	 */
 	public static void createTable(String tableName,String[] fams,int version) throws Exception {
-		HBaseAdmin admin = new HBaseAdmin(connection);
-		if (admin.tableExists(tableName)) {
+//		HBaseAdmin admin = new HBaseAdmin(connection);
+		Admin admin = connection.getAdmin();
+		TableName tn = TableName.valueOf(tableName);
+		if (admin.tableExists(tn)) {
+			admin.disableTable(tn);
+			admin.deleteTable(tn);
+		}
+		/*if (admin.tableExists(tableName)) {
 			admin.disableTable(tableName);
 			admin.deleteTable(tableName);
-		}
+		}*/
 		HTableDescriptor tableDescriptor = null;
 		HColumnDescriptor hd = null;
 		for (int i = 0; i < fams.length; i++) {
-			tableDescriptor = new HTableDescriptor(TableName.valueOf(tableName));
+			tableDescriptor = new HTableDescriptor(tn);
 			hd = new HColumnDescriptor(fams[i]);
 			hd.setMaxVersions(version);
 			tableDescriptor.addFamily(hd);
@@ -110,16 +123,23 @@ public class HbaseDB  implements Serializable{
 		admin.close();
 	}
 	public static void delTable(String tableName) throws Exception {
-		HBaseAdmin admin = new HBaseAdmin(connection);
-		if (admin.tableExists(tableName)) {
+//		HBaseAdmin admin = new HBaseAdmin(connection);
+		Admin admin = connection.getAdmin();
+		TableName tn = TableName.valueOf(tableName);
+		/*if (admin.tableExists(tableName)) {
 			admin.disableTable(tableName);
 			admin.deleteTable(tableName);
+		}*/
+		if (admin.tableExists(tn)) {
+			admin.disableTable(tn);
+			admin.deleteTable(tn);
 		}
 		admin.close();
 	}
 	
 	public static long getGid(String row) throws Exception {
-		HTable table_gid = new HTable(TableName.valueOf("gid"), connection);
+		Table table_gid = connection.getTable(TableName.valueOf("gid"));
+//		HTable table_gid = new HTable(TableName.valueOf("gid"), connection);
 		long id = table_gid.incrementColumnValue(Bytes.toBytes(row), Bytes.toBytes("gid"), Bytes.toBytes(row), 1);
 		table_gid.close();
 		return id;
@@ -136,9 +156,11 @@ public class HbaseDB  implements Serializable{
 	 */
 	public static void add(String tableName, String rowKey, String family, String qualifier, String value) throws IOException {
 		//连接到table
-		HTable table = new HTable(TableName.valueOf(tableName), connection);
+//		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Table table = connection.getTable(TableName.valueOf(tableName));
 		Put put = new Put(Bytes.toBytes(rowKey));
-		put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+//		put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+		put.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
 		table.put(put);
 		table.close();
 	}
@@ -153,9 +175,11 @@ public class HbaseDB  implements Serializable{
 	 */
 	public static void add(String tableName, Long rowKey, String family, Long qualifier, String value) throws IOException {
 		//连接到table
-		HTable table = new HTable(TableName.valueOf(tableName), connection);
+//		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Table table = connection.getTable(TableName.valueOf(tableName));
 		Put put = new Put(Bytes.toBytes(rowKey));
-		put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+//		put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+		put.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
 		table.put(put);
 		table.close();
 	}
@@ -170,12 +194,15 @@ public class HbaseDB  implements Serializable{
 	 */
 	public static void add(String tableName, Long rowKey01,Long rowKey02, String family, String qualifier, Long value) throws IOException {
 		//连接到table
-		HTable table = new HTable(TableName.valueOf(tableName), connection);
+//		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Table table = connection.getTable(TableName.valueOf(tableName));
 		Put put = new Put(Bytes.add(Bytes.toBytes(rowKey01), Bytes.toBytes(rowKey02)));
 		if (qualifier!=null) {
-			put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+//			put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+			put.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
 		}else{
-			put.add(Bytes.toBytes(family), null, Bytes.toBytes(value));
+//			put.add(Bytes.toBytes(family), null, Bytes.toBytes(value));
+			put.addColumn(Bytes.toBytes(family), null, Bytes.toBytes(value));
 		}
 		table.put(put);
 		table.close();
@@ -191,12 +218,15 @@ public class HbaseDB  implements Serializable{
 	 */
 	public static void add(String tableName, Long rowKey01,Long rowKey02,Long rowKey03, String family, String qualifier, Long value01, Long value02) throws IOException {
 		//连接到table
-		HTable table = new HTable(TableName.valueOf(tableName), connection);
+//		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Table table = connection.getTable(TableName.valueOf(tableName));
 		Put put = new Put(Bytes.add(Bytes.toBytes(rowKey01), Bytes.toBytes(rowKey02), Bytes.toBytes(rowKey03)));
 		if (qualifier!=null) {
-			put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.add(Bytes.toBytes(value01), Bytes.toBytes(value02)));
+//			put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.add(Bytes.toBytes(value01), Bytes.toBytes(value02)));
+			put.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.add(Bytes.toBytes(value01), Bytes.toBytes(value02)));
 		}else{
-			put.add(Bytes.toBytes(family), null, Bytes.add(Bytes.toBytes(value01), Bytes.toBytes(value02)));
+//			put.add(Bytes.toBytes(family), null, Bytes.add(Bytes.toBytes(value01), Bytes.toBytes(value02)));
+			put.addColumn(Bytes.toBytes(family), null, Bytes.add(Bytes.toBytes(value01), Bytes.toBytes(value02)));
 		}
 		table.put(put);
 		table.close();
@@ -212,12 +242,15 @@ public class HbaseDB  implements Serializable{
 	 */
 	public static void add(String tableName, Long rowKey01,Long rowKey02, String family, String qualifier, String value) throws IOException {
 		//连接到table
-		HTable table = new HTable(TableName.valueOf(tableName), connection);
+//		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Table table = connection.getTable(TableName.valueOf(tableName));
 		Put put = new Put(Bytes.add(Bytes.toBytes(rowKey01), Bytes.toBytes(rowKey02)));
 		if (qualifier!=null) {
-			put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+//			put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+			put.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
 		}else{
-			put.add(Bytes.toBytes(family), null, Bytes.toBytes(value));
+//			put.add(Bytes.toBytes(family), null, Bytes.toBytes(value));
+			put.addColumn(Bytes.toBytes(family), null, Bytes.toBytes(value));
 		}
 		table.put(put);
 		table.close();
@@ -233,9 +266,11 @@ public class HbaseDB  implements Serializable{
 	 */
 	public static void add(String tableName, Long rowKey, String family, String qualifier, String value) throws IOException {
 		//连接到table
-		HTable table = new HTable(TableName.valueOf(tableName), connection);
+//		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Table table = connection.getTable(TableName.valueOf(tableName));
 		Put put = new Put(Bytes.toBytes(rowKey));
-		put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+//		put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+		put.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
 		table.put(put);
 		table.close();
 	}
@@ -250,9 +285,11 @@ public class HbaseDB  implements Serializable{
 	 */
 	public static void add(String tableName, Long rowKey, String family, String qualifier, Long value) throws IOException {
 		//连接到table
-		HTable table = new HTable(TableName.valueOf(tableName), connection);
+//		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Table table = connection.getTable(TableName.valueOf(tableName));
 		Put put = new Put(Bytes.toBytes(rowKey));
-		put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+//		put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+		put.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
 		table.put(put);
 		table.close();
 	}
@@ -267,9 +304,11 @@ public class HbaseDB  implements Serializable{
 	 */
 	public static void add(String tableName, String rowKey, String family, String qualifier, Long value) throws IOException {
 		//连接到table
-		HTable table = new HTable(TableName.valueOf(tableName), connection);
+//		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Table table = connection.getTable(TableName.valueOf(tableName));
 		Put put = new Put(Bytes.toBytes(rowKey));
-		put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+//		put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+		put.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
 		table.put(put);
 		table.close();
 	}
@@ -280,7 +319,8 @@ public class HbaseDB  implements Serializable{
 	 * @throws Exception
 	 */
 	public static void deleteRow(String tableName, String[] rowKey) throws Exception {
-		HTable table = new HTable(TableName.valueOf(tableName), connection);
+//		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Table table = connection.getTable(TableName.valueOf(tableName));
 		List<Delete> list = new ArrayList<Delete>();
 		for (int i = 0; i < rowKey.length; i++) {
 			Delete delete = new Delete(Bytes.toBytes(Long.valueOf(rowKey[i])));
@@ -291,14 +331,17 @@ public class HbaseDB  implements Serializable{
 	}
 	
 	public static void deleteColumns(String tableName,Long rowKey,String family, Long qualifier) throws Exception {
-		HTable table = new HTable(TableName.valueOf(tableName), connection);
+//		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Table table = connection.getTable(TableName.valueOf(tableName));
 		Delete delete = new Delete(Bytes.toBytes(rowKey));
-		delete.deleteColumns(Bytes.toBytes(family), Bytes.toBytes(qualifier));
+//		delete.deleteColumns(Bytes.toBytes(family), Bytes.toBytes(qualifier));
+		delete.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier));
 		table.delete(delete);
 		table.close();
 	}
 	public static void deleteRow(String tableName,Long rowKey01,Long rowKey02) throws Exception {
-		HTable table = new HTable(TableName.valueOf(tableName), connection);
+//		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Table table = connection.getTable(TableName.valueOf(tableName));
 		Delete delete = new Delete(Bytes.add(Bytes.toBytes(rowKey01), Bytes.toBytes(rowKey02)));
 		table.delete(delete);
 		table.close();
@@ -307,7 +350,8 @@ public class HbaseDB  implements Serializable{
 	public static long getIdByUsername(String name) {
 		long id = 0;
 		try {
-			HTable table = new HTable(TableName.valueOf("user_id"), connection);
+//			HTable table = new HTable(TableName.valueOf("user_id"), connection);
+			Table table = connection.getTable(TableName.valueOf("user_id"));
 			Get get = new Get(Bytes.toBytes(name));
 			get.addColumn(Bytes.toBytes("id"), Bytes.toBytes("id"));
 			Result rs = table.get(get);
@@ -322,7 +366,8 @@ public class HbaseDB  implements Serializable{
 	}
 	public boolean checkUsername(String name) {
 		try {
-			HTable table = new HTable(TableName.valueOf("user_id"), connection);
+//			HTable table = new HTable(TableName.valueOf("user_id"), connection);
+			Table table = connection.getTable(TableName.valueOf("user_id"));
 			Get get = new Get(Bytes.toBytes(name));
 			table.exists(get);
 			if (table.exists(get)) {
@@ -341,7 +386,8 @@ public class HbaseDB  implements Serializable{
 	public static String getUserNameById(long id) {
 		String name = null;
 		try {
-			HTable table = new HTable(TableName.valueOf("id_user"), connection);
+//			HTable table = new HTable(TableName.valueOf("id_user"), connection);
+			Table table = connection.getTable(TableName.valueOf("id_user"));
 			Get get = new Get(Bytes.toBytes(id));
 			get.addColumn(Bytes.toBytes("user"), Bytes.toBytes("name"));
 			Result rs = table.get(get);
@@ -357,7 +403,8 @@ public class HbaseDB  implements Serializable{
 	public static String getStringById(String tableName,Long rowKey,String family,String qualifier) {
 		String name = null;
 		try {
-			HTable table = new HTable(TableName.valueOf(tableName), connection);
+//			HTable table = new HTable(TableName.valueOf(tableName), connection);
+			Table table = connection.getTable(TableName.valueOf(tableName));
 			Get get = new Get(Bytes.toBytes(rowKey));
 			get.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier));
 			Result rs = table.get(get);
@@ -378,7 +425,8 @@ public class HbaseDB  implements Serializable{
 	public static long getIdByDirName(String name) {
 		long id = 0;
 		try {
-			HTable table = new HTable(TableName.valueOf("hdfs_name"), connection);
+//			HTable table = new HTable(TableName.valueOf("hdfs_name"), connection);
+			Table table = connection.getTable(TableName.valueOf("hdfs_name"));
 			Get get = new Get(name.getBytes());
 			get.addColumn(Bytes.toBytes("id"), Bytes.toBytes("id"));
 			Result rs = table.get(get);
@@ -393,7 +441,8 @@ public class HbaseDB  implements Serializable{
 	}
 	
 	public static boolean checkEmail(String email) throws Exception {
-		HTable table = new HTable(TableName.valueOf("email_user"), connection);
+//		HTable table = new HTable(TableName.valueOf("email_user"), connection);
+		Table table = connection.getTable(TableName.valueOf("email_user"));
 		Get get = new Get(Bytes.toBytes(email));
 		get.addColumn(Bytes.toBytes("user"), Bytes.toBytes("userid"));
 		Result rs = table.get(get);
@@ -411,7 +460,8 @@ public class HbaseDB  implements Serializable{
 		if (id==0) {
 			return 0;
 		}
-		HTable table = new HTable(TableName.valueOf("id_user"), connection);
+//		HTable table = new HTable(TableName.valueOf("id_user"), connection);
+		Table table = connection.getTable(TableName.valueOf("id_user"));
 		Get get = new Get(Bytes.toBytes(id));
 		get.addColumn(Bytes.toBytes("user"), Bytes.toBytes("pwd"));
 		Result rs = table.get(get);
@@ -425,7 +475,8 @@ public class HbaseDB  implements Serializable{
 	}
 	
 	public void queryAll(String tableName) throws Exception {
-		HTable table = new HTable(TableName.valueOf(tableName), connection);
+//		HTable table = new HTable(TableName.valueOf(tableName), connection);
+		Table table = connection.getTable(TableName.valueOf(tableName));
 		ResultScanner rs = table.getScanner(new Scan());
 		for (Result result : rs) {
 			System.out.println("rowkey" +result.getRow());
@@ -438,7 +489,8 @@ public class HbaseDB  implements Serializable{
 		table.close();
 	}
 	public void queryAllHDFS(String username) throws Exception {
-		HTable table = new HTable(TableName.valueOf("hdfs"), connection);
+//		HTable table = new HTable(TableName.valueOf("hdfs"), connection);
+		Table table = connection.getTable(TableName.valueOf("hdfs"));
 		ResultScanner rs = table.getScanner(new Scan());
 		for (Result result : rs) {
 			System.out.println("rowkey" +result.getRow());
@@ -452,7 +504,8 @@ public class HbaseDB  implements Serializable{
 	}
 	
 	public static List<Menu> qureyAllEmun() throws Exception {
-		HTable table = new HTable(TableName.valueOf("emun"), connection);
+//		HTable table = new HTable(TableName.valueOf("emun"), connection);
+		Table table = connection.getTable(TableName.valueOf("emun"));
 		ResultScanner rs = table.getScanner(new Scan());
 		List<Menu> menus = new ArrayList<Menu>();
 		Menu m = null;
@@ -470,11 +523,13 @@ public class HbaseDB  implements Serializable{
 	}
 	
 	public static void getAllUserTree(Long id) throws Exception {
-		HTable table_hdfs = new HTable(TableName.valueOf("hdfs"), connection);
-		HTable table = new HTable(TableName.valueOf("hdfs_cid"), connection);
+//		HTable table_hdfs = new HTable(TableName.valueOf("hdfs"), connection);
+//		HTable table = new HTable(TableName.valueOf("hdfs_cid"), connection);
+		Table table_hdfs = connection.getTable(TableName.valueOf("hdfs"));
+		Table table = connection.getTable(TableName.valueOf("hdfs_cid"));
 		Get get = new Get(Bytes.toBytes(id));
 		Result rs = table.get(get);
-		List<Menu> menus = new ArrayList<Menu>();
+//		List<Menu> menus = new ArrayList<Menu>();
 		Menu menu = null;
 		for (Cell cell : rs.rawCells()) {
 			Get get1 = new Get(CellUtil.cloneValue(cell));
@@ -484,9 +539,9 @@ public class HbaseDB  implements Serializable{
 			String name = Bytes.toString(value);
 			
 			get1.addColumn(Bytes.toBytes("dir"), Bytes.toBytes("type"));
-			Result rs2 = table_hdfs.get(get1);
-			byte[] type = rs2.getValue(Bytes.toBytes("dir"), Bytes.toBytes("type"));
-			String y = Bytes.toString(type);
+//			Result rs2 = table_hdfs.get(get1);
+//			byte[] type = rs2.getValue(Bytes.toBytes("dir"), Bytes.toBytes("type"));
+//			String y = Bytes.toString(type);
 			menu = new Menu();
 			menu.setId(Bytes.toString(CellUtil.cloneValue(cell)));
 			menu.setName(name);
@@ -495,7 +550,8 @@ public class HbaseDB  implements Serializable{
 	}
 	
 	public static List<FileSystemVo> getFile(String dir) throws Exception {
-		HTable fileTable = new HTable(TableName.valueOf("filesystem"), connection);
+//		HTable fileTable = new HTable(TableName.valueOf("filesystem"), connection);
+		Table fileTable = connection.getTable(TableName.valueOf("filesystem"));
 		Scan scan = new Scan();
 		Filter filter = new QualifierFilter(CompareOp.LESS_OR_EQUAL, new SubstringComparator(dir));
 		scan.setFilter(filter);
@@ -527,7 +583,8 @@ public class HbaseDB  implements Serializable{
 		return fs;
 	}
 	public static void delByDir(String dir) throws Exception {
-		HTable fileTable = new HTable(TableName.valueOf("filesystem"), connection);
+//		HTable fileTable = new HTable(TableName.valueOf("filesystem"), connection);
+		Table fileTable = connection.getTable(TableName.valueOf("filesystem"));
 		Scan scan = new Scan();
 		Filter filter = new QualifierFilter(CompareOp.LESS_OR_EQUAL, new BinaryComparator(Bytes.toBytes(dir)));
 		scan.setFilter(filter);
@@ -569,7 +626,8 @@ public class HbaseDB  implements Serializable{
 	public Set<String> getFollow(String username) throws Exception {
 		Set<String> set = new HashSet<String>();
 		long id = this.getIdByUsername(username);
-		HTable table = new HTable(TableName.valueOf("follow"), connection);
+//		HTable table = new HTable(TableName.valueOf("follow"), connection);
+		Table table = connection.getTable(TableName.valueOf("follow"));
 		Get get = new Get(Bytes.toBytes(id));
 		Result rs = table.get(get);
 		for (Cell cell : rs.rawCells()) {
@@ -608,7 +666,8 @@ public class HbaseDB  implements Serializable{
 		Scan scan = new Scan();
 		scan.setStartRow(Bytes.toBytes(uid));
 		scan.setStopRow(Bytes.toBytes(uid+1));
-		HTable share_table = new HTable(TableName.valueOf("share"), connection);
+//		HTable share_table = new HTable(TableName.valueOf("share"), connection);
+		Table share_table = connection.getTable(TableName.valueOf("share"));
 		ResultScanner rs = share_table.getScanner(scan);
 		List<ShareVo> shareVos = new ArrayList<ShareVo>();
 		ShareVo share = null;
@@ -639,9 +698,11 @@ public class HbaseDB  implements Serializable{
 		Scan scan = new Scan();
 		scan.setStartRow(Bytes.toBytes(uid));
 		scan.setStopRow(Bytes.toBytes(uid+1));
-		HTable shareed_table = new HTable(TableName.valueOf("shareed"), connection);
+//		HTable shareed_table = new HTable(TableName.valueOf("shareed"), connection);
+		Table shareed_table = connection.getTable(TableName.valueOf("shareed"));
 		ResultScanner rs = shareed_table.getScanner(scan);
-		HTable share_table = new HTable(TableName.valueOf("share"), connection);
+//		HTable share_table = new HTable(TableName.valueOf("share"), connection);
+		Table share_table = connection.getTable(TableName.valueOf("share"));
 		List<FileSystemVo> fs = new ArrayList<FileSystemVo>();
 		FileSystemVo f = null;
 		for (Result r : rs) {
@@ -684,7 +745,8 @@ public class HbaseDB  implements Serializable{
 		Scan scan = new Scan();
 		scan.setStartRow(Bytes.toBytes(uid));
 		scan.setStopRow(Bytes.toBytes(uid+1));
-		HTable table = new HTable(TableName.valueOf("book"), connection);
+//		HTable table = new HTable(TableName.valueOf("book"), connection);
+		Table table = connection.getTable(TableName.valueOf("book"));
 		ResultScanner rs = table.getScanner(scan);
 		List<bookVo> books = new ArrayList<bookVo>();
 		bookVo book = null;

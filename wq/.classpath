@@ -43,12 +43,6 @@
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/spring-webmvc-4.0.5.RELEASE.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/spring-webmvc-portlet-4.0.5.RELEASE.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/spring-websocket-4.0.5.RELEASE.jar"/>
-	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/zookeeper-3.4.6.jar"/>
-	<classpathentry kind="con" path="com.genuitec.runtime.library/com.genuitec.generic_6.0">
-		<attributes>
-			<attribute name="owner.project.facets" value="#system#;jst.web"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="com.genuitec.runtime.library/com.genuitec.jstl_1.2.2">
 		<attributes>
 			<attribute name="org.eclipse.jst.component.dependency" value="WEB-INF/lib"/>
@@ -60,5 +54,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ice"/>
+	<classpathentry kind="con" path="com.genuitec.runtime.library/com.genuitec.generic_7.0"/>
 	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
 </classpath>
